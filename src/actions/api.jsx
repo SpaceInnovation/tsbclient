@@ -1,0 +1,4 @@
+const { REACT_APP_DEV_API_URL, REACT_APP_DEV_API_KEY } = process.env;
+
+export const BACKEND_URL = REACT_APP_DEV_API_URL;
+export const API_KEY = REACT_APP_DEV_API_KEY;
