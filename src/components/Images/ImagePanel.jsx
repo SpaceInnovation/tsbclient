@@ -41,6 +41,9 @@ class ImagePanel extends React.Component {
     this.state = {
       teacherDetails: eachData,
     };
+    const print = () => {
+      window.print();
+    };
   }
 
   render() {
@@ -109,6 +112,7 @@ class ImagePanel extends React.Component {
               </Grid>
               <Grid item xs={4} sm={2} md={2}>
                 <Button
+                  onClick={this.print()}
                   variant="contained"
                   style={{
                     background: "green",
