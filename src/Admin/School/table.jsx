@@ -9,6 +9,8 @@ import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import EnhancedTableHead from "../../components/Table/EnhancedTableHead";
+import Button from "@material-ui/core/Button";
+
 import EnhancedTableToolbar from "../../components/Table/EnhancedTableToolbar";
 const Link = require("react-router-dom").Link;
 
@@ -256,7 +258,19 @@ export default function EnhancedTable(props) {
                     </TableCell>
 
                     <TableCell className={classes.tableCellPadding}>
-                      <Link to={`/school/details/${row._id}`}>Detalis</Link>
+                      <Button
+                        size="small"
+                        color="primary"
+                        variant="contained"
+                        style={{ backgroundColor: "#4bc9f9" }}
+                      >
+                        <Link
+                          to={`/school/details/${row._id}`}
+                          style={{ textDecoration: "none", color: "#fff" }}
+                        >
+                          Details
+                        </Link>
+                      </Button>
                     </TableCell>
                   </TableRow>
                 );

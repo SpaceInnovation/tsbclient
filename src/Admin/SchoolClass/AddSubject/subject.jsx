@@ -2,10 +2,10 @@ import { Grid, Typography } from "@material-ui/core";
 import React, { Fragment } from "react";
 import { connect } from "react-redux";
 import {
-  deleteSchoolClass,
-  patchSchoolClass,
-  postSchoolClass,
-} from "../../../actions/action_admin_school_class";
+  deleteSchoolSubject,
+  patchSchoolSubject,
+  postSchoolSubject,
+} from "../../../actions/actions_admin_school_subject";
 import Snackbar from "@material-ui/core/Snackbar";
 import MySnackbar from "../../../components/Snackbar";
 import TableCell from "@material-ui/core/TableCell";
@@ -14,7 +14,7 @@ import Table from "./table";
 import { getFromLocalStorage } from "../../../helpers/browserStorage";
 import { BACKEND_URL, API_KEY } from "../../../actions/api";
 import Validator from "../../../helpers/validator";
-import { fetchAllSchoolClasses } from "../../../actions/actions_admin_school";
+import { fetchAllSchoolSubjects } from "../../../actions/actions_admin_school_subject";
 
 const columnData = [
   {
@@ -38,7 +38,7 @@ const properties = [
 
 let filteredArray;
 
-class School extends React.Component {
+class Subject extends React.Component {
   state = {
     data: [],
     snackBarOpen: false,
@@ -47,52 +47,55 @@ class School extends React.Component {
   };
 
   async componentDidMount() {
-    const { fetchAllSchoolClasses } = this.props;
+    const { fetchAllSchoolSubjects } = this.props;
     const { match } = this.props;
     const { id } = match.params;
-    console.log("id", id);
-    await fetchAllSchoolClasses(id);
+    await fetchAllSchoolSubjects(id);
     this.fetchData();
   }
 
   componentWillReceiveProps(newProps) {
-    const { fetchAllSchoolClasses } = newProps.school;
-    const success = fetchAllSchoolClasses
-      ? fetchAllSchoolClasses.success
+    const { fetchAllSchoolSubjects } = newProps.schoolSubject;
+    const success = fetchAllSchoolSubjects
+      ? fetchAllSchoolSubjects.success
       : null;
     if (success === false) {
       this.setState({
         snackBarOpen: true,
         snackBarVariant: "error",
-        snackBarMessage: fetchAllSchoolClasses.message,
+        snackBarMessage: fetchAllSchoolSubjects.message,
         loading: false,
       });
       return false;
     }
     if (
-      Validator.propertyExist(newProps.school, "fetchAllSchoolClasses") &&
-      typeof newProps.school.fetchAllSchoolClasses === "object"
+      Validator.propertyExist(
+        newProps.schoolSubject,
+        "fetchAllSchoolSubjects"
+      ) &&
+      typeof newProps.schoolSubject.fetchAllSchoolSubjects === "object"
     ) {
       setTimeout(() => {
         this.setState({
-          data: fetchAllSchoolClasses.data,
+          data: fetchAllSchoolSubjects,
         });
       }, 1000);
     } else return null;
   }
 
   componentDidUpdate(prevProps) {
-    const { schoolClass } = this.props;
+    const { schoolSubject } = this.props;
     if (
-      schoolClass.deleteSchoolClass !== prevProps.schoolClass.deleteSchoolClass
+      schoolSubject.deleteSchoolSubject !==
+      prevProps.schoolSubject.deleteSchoolSubject
     ) {
-      const { deleteSchoolClass } = schoolClass;
-      const { success } = deleteSchoolClass;
+      const { deleteSchoolSubject } = schoolSubject;
+      const { success } = deleteSchoolSubject;
       if (success === false) {
         this.setState({
           snackBarOpen: true,
           snackBarVariant: "error",
-          snackBarMessage: deleteSchoolClass.message,
+          snackBarMessage: deleteSchoolSubject.message,
           loading: false,
         });
         return false;
@@ -102,7 +105,7 @@ class School extends React.Component {
         data: filteredArray,
         snackBarOpen: true,
         snackBarVariant: "success",
-        snackBarMessage: deleteSchoolClass,
+        snackBarMessage: deleteSchoolSubject,
         loading: false,
       });
     }
@@ -111,7 +114,7 @@ class School extends React.Component {
   fetchData = () => {
     const { match } = this.props;
     const { id } = match.params;
-    return fetch(`${BACKEND_URL}/schoolClasses/school/${id}/?key=${API_KEY}`, {
+    return fetch(`${BACKEND_URL}/SchoolSubjects/school/${id}/?key=${API_KEY}`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -125,7 +128,7 @@ class School extends React.Component {
       .then((response) => response.json())
       .then((json) => {
         this.setState({
-          data: json ? json.data : null,
+          data: json ? json : null,
         });
         if (json.error) {
           throw json.error;
@@ -134,13 +137,13 @@ class School extends React.Component {
       .catch((error) => console.log(error));
   };
 
-  handleDeleteClick = (schoolClassIDs) => {
+  handleDeleteClick = (schoolSubjectIDs) => {
     const { data } = this.state;
-    const { deleteSchoolClass } = this.props;
-    schoolClassIDs.forEach((schoolClassID, index) => {
-      deleteSchoolClass(schoolClassID);
+    const { deleteSchoolSubject } = this.props;
+    schoolSubjectIDs.forEach((schoolSubjectID, index) => {
+      deleteSchoolSubject(schoolSubjectID);
       filteredArray = data.filter(
-        (datum) => schoolClassIDs.indexOf(datum._id) === -1
+        (datum) => schoolSubjectIDs.indexOf(datum._id) === -1
       );
     });
     this.setState({
@@ -163,14 +166,14 @@ class School extends React.Component {
   };
 
   editButtonDisplay = (n) => {
-    const { patchSchoolClass, schoolClass } = this.props;
+    const { patchSchoolSubject, schoolSubject } = this.props;
     return (
       <TableCell>
         <AddNew
           type="edit"
           eachData={n}
-          schoolClass={schoolClass}
-          patchSchoolClass={patchSchoolClass}
+          schoolSubject={schoolSubject}
+          patchSchoolSubject={patchSchoolSubject}
           fetchData={this.fetchData}
         />
       </TableCell>
@@ -179,38 +182,45 @@ class School extends React.Component {
 
   render() {
     const { data, snackBarOpen, snackBarMessage, snackBarVariant } = this.state;
-    const { schoolClass, postSchoolClass, match } = this.props;
+    const { schoolSubject, postSchoolSubject, match } = this.props;
     const { id } = match.params;
+    let schoolName;
+    data.forEach((element) => {
+      schoolName = element.school.name;
+    });
 
     return (
       <Fragment>
         <Grid container>
-          <AddNew
-            type="add"
-            data={data}
-            schoolClass={schoolClass}
-            postSchoolClass={postSchoolClass}
-            fetchData={this.fetchData}
-            id={id}
-          />
-          <div
-            style={{
-              textAlign: "center",
-              justifyContent: "center",
-              color: "#2196f3",
-            }}
-          >
-            <Typography variant="h5" component="h5">
-              {/* {school.name} */}
-            </Typography>
-          </div>
+          <Grid item xs={12} sm={6} md={6}>
+            <AddNew
+              type="add"
+              data={data}
+              schoolSubject={schoolSubject}
+              postSchoolSubject={postSchoolSubject}
+              fetchData={this.fetchData}
+              id={id}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={6}>
+            <div
+              style={{
+                textAlign: "center",
+                justifyContent: "center",
+                color: "#2196f3",
+              }}
+            >
+              <Typography variant="h5" component="h5">
+                {schoolName}
+              </Typography>
+            </div>
+          </Grid>
         </Grid>
         <Grid container item xs={12} sm={12} md={12}>
           <div style={{ display: "flex" }}>
             <h4 style={{ marginRight: "10px" }}>List Of All Subjects</h4>
             <h3>{`[ ${data.length} ]`}</h3>
           </div>
-
           <Table
             columnData={columnData}
             data={data}
@@ -239,22 +249,22 @@ class School extends React.Component {
   }
 }
 const mapStateToProps = (state) => ({
-  schoolClass: state.schoolClass,
-  school: state.school,
+  schoolSubject: state.schoolSubject,
 });
 
 const mapDispatchStateToProps = (dispatch) => ({
-  // School
-  fetchAllSchoolClasses: (id) => {
-    dispatch(fetchAllSchoolClasses(id));
+  // School Subject
+  fetchAllSchoolSubjects: (id) => {
+    dispatch(fetchAllSchoolSubjects(id));
   },
-  deleteSchoolClass: (id) => {
-    dispatch(deleteSchoolClass(id));
+  deleteSchoolSubject: (id) => {
+    dispatch(deleteSchoolSubject(id));
   },
-  patchSchoolClass: (data, id) => dispatch(patchSchoolClass(data, id)),
-  postSchoolClass: (data, id) => {
-    dispatch(postSchoolClass(data, id));
+  patchSchoolSubject: (data, schoolId, id) =>
+    dispatch(patchSchoolSubject(data, schoolId, id)),
+  postSchoolSubject: (data, id) => {
+    dispatch(postSchoolSubject(data, id));
   },
 });
 
-export default connect(mapStateToProps, mapDispatchStateToProps)(School);
+export default connect(mapStateToProps, mapDispatchStateToProps)(Subject);

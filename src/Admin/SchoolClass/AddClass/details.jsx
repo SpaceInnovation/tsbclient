@@ -138,7 +138,6 @@ class AddPage extends Component {
       onCloseModal,
       id,
     } = this.props;
-    console.log("eachData", eachData);
 
     switch (pageType) {
       case "add":
@@ -156,7 +155,7 @@ class AddPage extends Component {
 
         break;
       case "edit":
-        patchSchoolClass(values, eachData._id);
+        patchSchoolClass(values, eachData.school._id, eachData._id);
         this.setState({
           loading: true,
         });
@@ -189,13 +188,17 @@ class AddPage extends Component {
       snackBarVariant,
     } = this.state;
     const values = { classes };
+    const { postSchoolClass } = this.props;
 
     return (
       <>
         <div>
           <Card>
-            <CardHeader title="Add New Class" style={{ color: "#2196f3" }} />
-
+            {postSchoolClass ? (
+              <CardHeader title="Add New Class" style={{ color: "#2196f3" }} />
+            ) : (
+              <CardHeader title="Edit Class" style={{ color: "#2196f3" }} />
+            )}
             <CardContent>
               <div style={{ textAlign: "center", justifyContent: "center" }}>
                 <Typography variant="h5" component="h5">
@@ -257,7 +260,7 @@ class AddPage extends Component {
                       marginTop: "10px",
                     }}
                   >
-                    Add New
+                    {postSchoolClass ? "Add New" : "Edit"}
                   </Button>
                 </form>
               </div>

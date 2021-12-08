@@ -38,10 +38,10 @@ class AddNew extends Component {
     const {
       type,
       classes,
-      patchSchoolClass,
-      schoolClass,
+      patchSchoolSubject,
+      schoolSubject,
       eachData,
-      postSchoolClass,
+      postSchoolSubject,
       fetchData,
       id,
     } = this.props;
@@ -60,7 +60,7 @@ class AddNew extends Component {
             variant="contained"
             style={{ backgroundColor: "#4bc9f9" }}
           >
-            Add New Class
+            Add New Subject
           </Button>
         );
 
@@ -68,8 +68,8 @@ class AddNew extends Component {
           <PropertyStepper
             onCloseModal={this.handleClose}
             modalStatus={modal}
-            postSchoolClass={postSchoolClass}
-            schoolClass={schoolClass}
+            postSchoolSubject={postSchoolSubject}
+            schoolSubject={schoolSubject}
             fetchData={fetchData}
             id={id}
           />
@@ -84,9 +84,9 @@ class AddNew extends Component {
         modalContent = (
           <PropertyStepperEdit
             onCloseModal={this.handleClose}
-            schoolClass={schoolClass}
+            schoolSubject={schoolSubject}
             eachData={eachData}
-            patchSchoolClass={patchSchoolClass}
+            patchSchoolSubject={patchSchoolSubject}
             fetchData={fetchData}
           />
         );

@@ -11,6 +11,7 @@ import classReducer from "./reducers_admin_class";
 import schoolClassReducer from "./reducer_admin_school_class";
 import allocationReducer from "../reducers/reducers_admin_allocation";
 import lgaReducer from "../reducers/reducers_admin_lga";
+import schoolSujectReducer from "./reducers_admin_schol_subject";
 
 export default combineReducers({
   adminAuth: adminAuthReducer,
@@ -25,4 +26,5 @@ export default combineReducers({
   classReducer,
   allocation: allocationReducer,
   lgas: lgaReducer,
+  schoolSubject: schoolSujectReducer,
 });

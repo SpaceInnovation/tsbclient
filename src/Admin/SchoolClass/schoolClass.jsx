@@ -47,7 +47,6 @@ class School extends React.Component {
 
   async componentDidMount() {
     const { fetchSchoolClasses } = this.props;
-    console.log("this.props", this.props.match.params.id);
     await fetchSchoolClasses();
     // this.fetchData();
   }
@@ -177,7 +176,7 @@ class School extends React.Component {
     return (
       <Fragment>
         <Grid container>
-          <Grid item xs={12} sm={4} md={4}>
+          <Grid item xs={12} sm={6} md={6}>
             <AddNew
               type="add"
               data={data}
@@ -188,19 +187,10 @@ class School extends React.Component {
               fetchData={this.fetchData}
             />
           </Grid>
-          <Grid item xs={12} sm={4} md={4}>
-            <AddNew
-              type="addTeacher"
-              // eachData={n}
-              schoolClass={schoolClass}
-              patchSchoolClass={patchSchoolClass}
-              fetchData={this.fetchData}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4} md={4}>
+          <Grid item xs={12} sm={6} md={6}>
             <AddNew
               type="addSubject"
-              // eachData={n}
+              id={id}
               schoolClass={schoolClass}
               patchSchoolClass={patchSchoolClass}
               fetchData={this.fetchData}

@@ -181,29 +181,37 @@ class School extends React.Component {
     const { data, snackBarOpen, snackBarMessage, snackBarVariant } = this.state;
     const { schoolClass, postSchoolClass, match } = this.props;
     const { id } = match.params;
+    let schoolName;
+    data.forEach((element) => {
+      schoolName = element.school.name;
+    });
 
     return (
       <Fragment>
         <Grid container>
-          <AddNew
-            type="add"
-            data={data}
-            schoolClass={schoolClass}
-            postSchoolClass={postSchoolClass}
-            fetchData={this.fetchData}
-            id={id}
-          />
-          <div
-            style={{
-              textAlign: "center",
-              justifyContent: "center",
-              color: "#2196f3",
-            }}
-          >
-            <Typography variant="h5" component="h5">
-              {/* {school.name} */}
-            </Typography>
-          </div>
+          <Grid item xs={12} sm={6} md={6}>
+            <AddNew
+              type="add"
+              data={data}
+              schoolClass={schoolClass}
+              postSchoolClass={postSchoolClass}
+              fetchData={this.fetchData}
+              id={id}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={6}>
+            <div
+              style={{
+                textAlign: "center",
+                justifyContent: "center",
+                color: "#2196f3",
+              }}
+            >
+              <Typography variant="h5" component="h5">
+                {schoolName}
+              </Typography>
+            </div>
+          </Grid>
         </Grid>
         <Grid container item xs={12} sm={12} md={12}>
           <div style={{ display: "flex" }}>
@@ -251,7 +259,8 @@ const mapDispatchStateToProps = (dispatch) => ({
   deleteSchoolClass: (id) => {
     dispatch(deleteSchoolClass(id));
   },
-  patchSchoolClass: (data, id) => dispatch(patchSchoolClass(data, id)),
+  patchSchoolClass: (data, schoolId, id) =>
+    dispatch(patchSchoolClass(data, schoolId, id)),
   postSchoolClass: (data, id) => {
     dispatch(postSchoolClass(data, id));
   },

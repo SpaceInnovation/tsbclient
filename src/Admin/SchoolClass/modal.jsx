@@ -79,28 +79,7 @@ class AddNew extends Component {
         );
 
         break;
-      case "addTeacher":
-        modalButton = (
-          <Button
-            size="small"
-            color="primary"
-            onClick={this.handleClickOpen}
-            variant="contained"
-            style={{ backgroundColor: "#4bc9f9" }}
-          >
-            Add New Teacher
-          </Button>
-        );
-        modalContent = (
-          <PropertyStepperEdit
-            onCloseModal={this.handleClose}
-            schoolClass={schoolClass}
-            eachData={eachData}
-            patchSchoolClass={patchSchoolClass}
-            fetchData={fetchData}
-          />
-        );
-        break;
+
       case "addSubject":
         modalButton = (
           <Button

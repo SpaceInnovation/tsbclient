@@ -13,7 +13,7 @@ import Typography from "@material-ui/core/Typography";
 import { withStyles } from "@material-ui/core";
 import Validator from "../../../helpers/validator";
 import isEqual from "lodash/isEqual";
-import { fetchClasses } from "../../../actions/actions_admin_class";
+import { fetchSubjects } from "../../../actions/actions_admin_subject";
 
 const styles = (theme) => ({
   button: {
@@ -25,8 +25,8 @@ const styles = (theme) => ({
 });
 
 const initialstate = {
-  classes: "",
-  classList: [],
+  subject: "",
+  subjectList: [],
   loading: false,
   open: false,
   snackBarOpen: false,
@@ -47,30 +47,34 @@ class AddPage extends Component {
   };
 
   async componentDidMount() {
-    const { fetchClasses } = this.props;
-    await fetchClasses();
+    const { fetchSubjects } = this.props;
+    await fetchSubjects();
   }
 
   componentWillReceiveProps(newProps) {
-    const { schoolClass, onCloseModal, eachData } = this.props;
-    if (typeof newProps.classReducer.fetchClasses === "object") {
-      const data = newProps.classReducer.fetchClasses;
+    const { schoolSubject, onCloseModal, eachData } = this.props;
+    if (typeof newProps.subject.fetchSubjects === "object") {
+      const data = newProps.subject.fetchSubjects;
       this.setState({
-        classList: data,
+        subjectList: data,
       });
     }
     if (typeof eachData === "object") {
       setTimeout(() => {
         this.setState({
-          classes: eachData.classes._id,
+          subject: eachData.subject._id,
         });
       }, 2000);
     }
     if (
-      Validator.propertyExist(newProps, "schoolClass", "patchSchoolClass") &&
+      Validator.propertyExist(
+        newProps,
+        "schoolSubject",
+        "patchSchoolSubject"
+      ) &&
       isEqual(
-        schoolClass.patchSchoolClass,
-        newProps.schoolClass.patchSchoolClass
+        schoolSubject.patchSchoolSubject,
+        newProps.schoolSubject.patchSchoolSubject
       ) === false
     ) {
       setTimeout(() => {
@@ -80,17 +84,19 @@ class AddPage extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { schoolClass } = this.props;
+    const { schoolSubject } = this.props;
+    // console.log("schoolSubject", schoolSubject);
     if (
-      schoolClass.patchSchoolClass !== prevProps.schoolClass.patchSchoolClass
+      schoolSubject.patchSchoolSubject !==
+      prevProps.schoolSubject.patchSchoolSubject
     ) {
-      const { patchSchoolClass } = schoolClass;
-      const { success } = patchSchoolClass;
+      const { patchSchoolSubject } = schoolSubject;
+      const { success } = patchSchoolSubject;
       if (success === false) {
         this.setState({
           snackBarOpen: true,
           snackBarVariant: "error",
-          snackBarMessage: patchSchoolClass.message,
+          snackBarMessage: patchSchoolSubject,
           loading: false,
         });
         return false;
@@ -98,18 +104,21 @@ class AddPage extends Component {
       this.setState({
         snackBarOpen: true,
         snackBarVariant: "success",
-        snackBarMessage: patchSchoolClass,
+        snackBarMessage: patchSchoolSubject,
         loading: false,
       });
     }
-    if (schoolClass.postSchoolClass !== prevProps.schoolClass.postSchoolClass) {
-      const { postSchoolClass } = schoolClass;
-      const { success } = postSchoolClass;
+    if (
+      schoolSubject.postSchoolSubject !==
+      prevProps.schoolSubject.postSchoolSubject
+    ) {
+      const { postSchoolSubject } = schoolSubject;
+      const { success } = postSchoolSubject;
       if (success === false) {
         this.setState({
           snackBarOpen: true,
           snackBarVariant: "error",
-          snackBarMessage: postSchoolClass.message,
+          snackBarMessage: postSchoolSubject.message,
           loading: false,
         });
         return false;
@@ -117,7 +126,7 @@ class AddPage extends Component {
       this.setState({
         snackBarOpen: true,
         snackBarVariant: "success",
-        snackBarMessage: postSchoolClass,
+        snackBarMessage: postSchoolSubject,
         loading: false,
       });
     }
@@ -130,19 +139,18 @@ class AddPage extends Component {
   createProperty = (values, e) => {
     e.preventDefault();
     const {
-      postSchoolClass,
+      postSchoolSubject,
       pageType,
-      patchSchoolClass,
+      patchSchoolSubject,
       eachData,
       fetchData,
       onCloseModal,
       id,
     } = this.props;
-    console.log("eachData", eachData);
 
     switch (pageType) {
       case "add":
-        postSchoolClass(values, id);
+        postSchoolSubject(values, id);
         this.setState({
           loading: true,
         });
@@ -156,7 +164,7 @@ class AddPage extends Component {
 
         break;
       case "edit":
-        patchSchoolClass(values, eachData._id);
+        patchSchoolSubject(values, eachData.school._id, eachData._id);
         this.setState({
           loading: true,
         });
@@ -181,20 +189,28 @@ class AddPage extends Component {
   };
   render() {
     let {
-      classes,
-      classList,
+      subject,
+      subjectList,
       loading,
       snackBarOpen,
       snackBarMessage,
       snackBarVariant,
     } = this.state;
-    const values = { classes };
+    const values = { subject };
+    const { postSchoolSubject } = this.props;
 
     return (
       <>
         <div>
           <Card>
-            <CardHeader title="Add New Class" style={{ color: "#2196f3" }} />
+            {postSchoolSubject ? (
+              <CardHeader
+                title="Add New Subject"
+                style={{ color: "#2196f3" }}
+              />
+            ) : (
+              <CardHeader title="Edit Subject" style={{ color: "#2196f3" }} />
+            )}
 
             <CardContent>
               <div style={{ textAlign: "center", justifyContent: "center" }}>
@@ -216,7 +232,7 @@ class AddPage extends Component {
                       <Typography>Loading Please wait......</Typography>
                     </div>
                   ) : null}
-                  <h3 style={{ color: "#2196f3" }}>Class Details</h3>
+                  <h3 style={{ color: "#2196f3" }}>Subject Details</h3>
                   <FormControl fullWidth style={{ marginBottom: "10px" }}>
                     <InputLabel
                       style={{
@@ -225,20 +241,20 @@ class AddPage extends Component {
                       }}
                       id="demo-simple-select-label"
                     >
-                      Class
+                      Subject
                     </InputLabel>
                     <Select
                       labelId="demo-simple-select-label"
-                      id="selectedLgas"
-                      value={classes}
-                      name="classes"
+                      id="selectedSubject"
+                      value={subject}
+                      name="subject"
                       onChange={this.handleChange}
                       variant="outlined"
-                      label="Class"
+                      label="Subject"
                       required
                     >
-                      {classList.length > 0
-                        ? classList.map((item, key) => (
+                      {subjectList.length > 0
+                        ? subjectList.map((item, key) => (
                             <MenuItem key={key} value={item._id}>
                               {item.name}
                             </MenuItem>
@@ -257,7 +273,7 @@ class AddPage extends Component {
                       marginTop: "10px",
                     }}
                   >
-                    Add New
+                    {postSchoolSubject ? "Add New" : "Edit"}
                   </Button>
                 </form>
               </div>
@@ -280,12 +296,12 @@ class AddPage extends Component {
   }
 }
 const mapStateToProps = (state) => ({
-  classReducer: state.classReducer,
+  subject: state.subject,
 });
 
 const mapDispatchStateToProps = (dispatch) => ({
-  fetchClasses: () => {
-    dispatch(fetchClasses());
+  fetchSubjects: () => {
+    dispatch(fetchSubjects());
   },
 });
 

@@ -239,7 +239,7 @@ export default function EnhancedTable(props) {
                       padding="none"
                       numeric="false"
                     >
-                      {row ? row.classes.name : null}
+                      {row ? row.subject.name : null}
                     </TableCell>
 
                     <TableCell className={classes.tableCellPadding}>

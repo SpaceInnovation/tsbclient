@@ -3,8 +3,13 @@ import AddPage from "./details";
 
 class PropertyStepperEdit extends Component {
   render() {
-    const { onCloseModal, patchSchoolClass, eachData, schoolClass, fetchData } =
-      this.props;
+    const {
+      onCloseModal,
+      patchSchoolSubject,
+      eachData,
+      schoolSubject,
+      fetchData,
+    } = this.props;
 
     return (
       <>
@@ -12,9 +17,9 @@ class PropertyStepperEdit extends Component {
           <AddPage
             onCloseModal={onCloseModal}
             pageType="edit"
-            patchSchoolClass={patchSchoolClass}
+            patchSchoolSubject={patchSchoolSubject}
             eachData={eachData}
-            schoolClass={schoolClass}
+            schoolSubject={schoolSubject}
             fetchData={fetchData}
           />
         </div>

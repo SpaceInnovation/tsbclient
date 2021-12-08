@@ -5,8 +5,8 @@ class PropertyStepper extends Component {
   render() {
     const {
       onCloseModal,
-      postSchoolClass,
-      schoolClass,
+      postSchoolSubject,
+      schoolSubject,
       fetchData,
       eachData,
       id,
@@ -17,8 +17,8 @@ class PropertyStepper extends Component {
           <AddPage
             onCloseModal={onCloseModal}
             pageType="add"
-            postSchoolClass={postSchoolClass}
-            schoolClass={schoolClass}
+            postSchoolSubject={postSchoolSubject}
+            schoolSubject={schoolSubject}
             eachData={eachData}
             fetchData={fetchData}
             id={id}
