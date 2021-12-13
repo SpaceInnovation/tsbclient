@@ -12,6 +12,9 @@ import schoolClassReducer from "./reducer_admin_school_class";
 import allocationReducer from "../reducers/reducers_admin_allocation";
 import lgaReducer from "../reducers/reducers_admin_lga";
 import schoolSujectReducer from "./reducers_admin_schol_subject";
+import stateReducer from "./reducers_admin_state";
+import postingReducer from "./reducers_admin_posting";
+import schoolTeacherReducer from "./reducers_admin_school_teacher";
 
 export default combineReducers({
   adminAuth: adminAuthReducer,
@@ -27,4 +30,7 @@ export default combineReducers({
   allocation: allocationReducer,
   lgas: lgaReducer,
   schoolSubject: schoolSujectReducer,
+  state: stateReducer,
+  posting: postingReducer,
+  schoolTeacher: schoolTeacherReducer,
 });

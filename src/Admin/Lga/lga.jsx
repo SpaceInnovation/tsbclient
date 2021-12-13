@@ -42,6 +42,7 @@ class Lga extends React.Component {
   }
 
   componentWillReceiveProps(newProps) {
+    console.log("newProps", newProps);
     const { fetchLgas } = newProps.lgas;
     const { success } = fetchLgas;
     if (success === false) {
@@ -54,7 +55,7 @@ class Lga extends React.Component {
       return false;
     }
     if (
-      Validator.propertyExist(newProps.lga, "fetchLgas") &&
+      Validator.propertyExist(newProps.lgas, "fetchLgas") &&
       typeof newProps.lgas.fetchLgas === "object"
     ) {
       this.setState({
@@ -101,6 +102,7 @@ class Lga extends React.Component {
     })
       .then((response) => response.json())
       .then((json) => {
+        console.log("json", json);
         this.setState({
           data: json,
         });
@@ -163,8 +165,19 @@ class Lga extends React.Component {
 
   render() {
     const { data, snackBarOpen, snackBarMessage, snackBarVariant } = this.state;
+    const { lgas, postLgas } = this.props;
+
     return (
       <Fragment>
+        <Grid container>
+          <AddNew
+            type="add"
+            data={data}
+            lgas={lgas}
+            postLgas={postLgas}
+            fetchData={this.fetchData}
+          />
+        </Grid>
         <Grid container item xs={12} sm={12} md={12}>
           <div style={{ display: "flex" }}>
             <h4 style={{ marginRight: "10px" }}>

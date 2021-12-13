@@ -13,7 +13,7 @@ import Typography from "@material-ui/core/Typography";
 import { withStyles } from "@material-ui/core";
 import Validator from "../../../helpers/validator";
 import isEqual from "lodash/isEqual";
-import { fetchSubjects } from "../../../actions/actions_admin_subject";
+import { fetchTeachers } from "../../../actions/actions_admin_teacher";
 
 const styles = (theme) => ({
   button: {
@@ -26,7 +26,7 @@ const styles = (theme) => ({
 
 const initialstate = {
   subject: "",
-  subjectList: [],
+  teacherList: [],
   loading: false,
   open: false,
   snackBarOpen: false,
@@ -47,34 +47,34 @@ class AddPage extends Component {
   };
 
   async componentDidMount() {
-    const { fetchSubjects } = this.props;
-    await fetchSubjects();
+    const { fetchTeachers } = this.props;
+    await fetchTeachers();
   }
 
   componentWillReceiveProps(newProps) {
-    const { schoolSubject, onCloseModal, eachData } = this.props;
-    if (typeof newProps.subject.fetchSubjects === "object") {
-      const data = newProps.subject.fetchSubjects;
+    const { schoolTeacher, onCloseModal, eachData } = this.props;
+    if (typeof newProps.teacher.fetchTeachers === "object") {
+      const data = newProps.teacher.fetchTeachers;
       this.setState({
-        subjectList: data,
+        teacherList: data,
       });
     }
     if (typeof eachData === "object") {
       setTimeout(() => {
         this.setState({
-          subject: eachData.subject._id,
+          teacher: eachData.teacher._id,
         });
       }, 2000);
     }
     if (
       Validator.propertyExist(
         newProps,
-        "schoolSubject",
-        "patchSchoolSubject"
+        "schoolTeacher",
+        "patchSchoolTeacher"
       ) &&
       isEqual(
-        schoolSubject.patchSchoolSubject,
-        newProps.schoolSubject.patchSchoolSubject
+        schoolTeacher.patchSchoolTeacher,
+        newProps.schoolTeacher.patchSchoolTeacher
       ) === false
     ) {
       setTimeout(() => {
@@ -84,18 +84,18 @@ class AddPage extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { schoolSubject } = this.props;
+    const { schoolTeacher } = this.props;
     if (
-      schoolSubject.patchSchoolSubject !==
-      prevProps.schoolSubject.patchSchoolSubject
+      schoolTeacher.patchSchoolTeacher !==
+      prevProps.schoolTeacher.patchSchoolTeacher
     ) {
-      const { patchSchoolSubject } = schoolSubject;
-      const { success } = patchSchoolSubject;
+      const { patchSchoolTeacher } = schoolTeacher;
+      const { success } = patchSchoolTeacher;
       if (success === false) {
         this.setState({
           snackBarOpen: true,
           snackBarVariant: "error",
-          snackBarMessage: patchSchoolSubject,
+          snackBarMessage: patchSchoolTeacher,
           loading: false,
         });
         return false;
@@ -103,21 +103,21 @@ class AddPage extends Component {
       this.setState({
         snackBarOpen: true,
         snackBarVariant: "success",
-        snackBarMessage: patchSchoolSubject,
+        snackBarMessage: patchSchoolTeacher,
         loading: false,
       });
     }
     if (
-      schoolSubject.postSchoolSubject !==
-      prevProps.schoolSubject.postSchoolSubject
+      schoolTeacher.postSchoolTeacher !==
+      prevProps.schoolTeacher.postSchoolTeacher
     ) {
-      const { postSchoolSubject } = schoolSubject;
-      const { success } = postSchoolSubject;
+      const { postSchoolTeacher } = schoolTeacher;
+      const { success } = postSchoolTeacher;
       if (success === false) {
         this.setState({
           snackBarOpen: true,
           snackBarVariant: "error",
-          snackBarMessage: postSchoolSubject.message,
+          snackBarMessage: postSchoolTeacher.message,
           loading: false,
         });
         return false;
@@ -125,7 +125,7 @@ class AddPage extends Component {
       this.setState({
         snackBarOpen: true,
         snackBarVariant: "success",
-        snackBarMessage: postSchoolSubject,
+        snackBarMessage: postSchoolTeacher,
         loading: false,
       });
     }
@@ -138,9 +138,9 @@ class AddPage extends Component {
   createProperty = (values, e) => {
     e.preventDefault();
     const {
-      postSchoolSubject,
+      postSchoolTeacher,
       pageType,
-      patchSchoolSubject,
+      patchSchoolTeacher,
       eachData,
       fetchData,
       onCloseModal,
@@ -149,7 +149,7 @@ class AddPage extends Component {
 
     switch (pageType) {
       case "add":
-        postSchoolSubject(values, id);
+        postSchoolTeacher(values, id);
         this.setState({
           loading: true,
         });
@@ -163,7 +163,7 @@ class AddPage extends Component {
 
         break;
       case "edit":
-        patchSchoolSubject(values, eachData.school._id, eachData._id);
+        patchSchoolTeacher(values, eachData.teacher._id, eachData._id);
         this.setState({
           loading: true,
         });
@@ -188,35 +188,33 @@ class AddPage extends Component {
   };
   render() {
     let {
-      subject,
-      subjectList,
+      teacher,
+      teacherList,
       loading,
       snackBarOpen,
       snackBarMessage,
       snackBarVariant,
     } = this.state;
 
-    const values = { subject };
-    const { postSchoolSubject } = this.props;
+    const values = { teacher };
+    const { postSchoolTeacher } = this.props;
 
     return (
       <>
         <div>
           <Card>
-            {postSchoolSubject ? (
+            {postSchoolTeacher ? (
               <CardHeader
-                title="Add New Subject"
+                title="Add New Teacher"
                 style={{ color: "#2196f3" }}
               />
             ) : (
-              <CardHeader title="Edit Subject" style={{ color: "#2196f3" }} />
+              <CardHeader title="Edit Teacher" style={{ color: "#2196f3" }} />
             )}
 
             <CardContent>
               <div style={{ textAlign: "center", justifyContent: "center" }}>
-                <Typography variant="h5" component="h5">
-                  {/* {eachData.schoo} */}
-                </Typography>
+                <Typography variant="h5" component="h5"></Typography>
                 <form onSubmit={this.createProperty.bind(null, values)}>
                   {loading ? (
                     <div>
@@ -241,22 +239,22 @@ class AddPage extends Component {
                       }}
                       id="demo-simple-select-label"
                     >
-                      Subject
+                      Teacher
                     </InputLabel>
                     <Select
                       labelId="demo-simple-select-label"
-                      id="selectedSubject"
-                      value={subject}
-                      name="subject"
+                      id="selectedTeacher"
+                      value={teacher}
+                      name="teacher"
                       onChange={this.handleChange}
                       variant="outlined"
-                      label="Subject"
+                      label="Teacher"
                       required
                     >
-                      {subjectList.length > 0
-                        ? subjectList.map((item, key) => (
+                      {teacherList.length > 0
+                        ? teacherList.map((item, key) => (
                             <MenuItem key={key} value={item._id}>
-                              {item.name}
+                              {item.surname}
                             </MenuItem>
                           ))
                         : null}
@@ -273,7 +271,7 @@ class AddPage extends Component {
                       marginTop: "10px",
                     }}
                   >
-                    {postSchoolSubject ? "Add New" : "Edit"}
+                    {postSchoolTeacher ? "Add New" : "Edit"}
                   </Button>
                 </form>
               </div>
@@ -296,12 +294,12 @@ class AddPage extends Component {
   }
 }
 const mapStateToProps = (state) => ({
-  subject: state.subject,
+  teacher: state.teacher,
 });
 
 const mapDispatchStateToProps = (dispatch) => ({
-  fetchSubjects: () => {
-    dispatch(fetchSubjects());
+  fetchTeachers: () => {
+    dispatch(fetchTeachers());
   },
 });
 

@@ -1,28 +1,22 @@
 import {
-  FETCH_ALL_SCHOOLS,
-  DELETE_SCHOOL,
-  POST_SCHOOL,
-  PATCH_SCHOOL,
-  FETCH_SCHOOL_BY_ID,
+  FETCH_ALL_STATES,
+  DELETE_STATE,
+  POST_STATE,
+  PATCH_STATE,
 } from "./types";
 import { BACKEND_URL, API_KEY } from "./api";
 import { getFromLocalStorage } from "../helpers/browserStorage";
 
-export const loadPostSchool = (result) => {
+export const loadPostState = (result) => {
   return {
-    type: POST_SCHOOL,
+    type: POST_STATE,
     payload: result,
   };
 };
 
-export const postSchool = (data) => {
-  const userData = {
-    name: data.name,
-    lga: data.lga,
-  };
-
+export const postState = (data) => {
   return (dispatch) =>
-    fetch(`${BACKEND_URL}/school/create/?key=${API_KEY}`, {
+    fetch(`${BACKEND_URL}/states/create/?key=${API_KEY}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -31,18 +25,18 @@ export const postSchool = (data) => {
           JSON.parse(getFromLocalStorage("tsb-login:admin")).token
         }`,
       },
-      body: JSON.stringify(userData),
+      body: JSON.stringify(data),
     })
       .then((response) => response.json())
       .then((json) => {
         if (json.error) {
           throw json.error;
         }
-        return dispatch(loadPostSchool(json));
+        return dispatch(loadPostState(json.message));
       })
       .catch((error) =>
         dispatch(
-          loadPostSchool({
+          loadPostState({
             success: false,
             message: error.message,
           })
@@ -50,16 +44,16 @@ export const postSchool = (data) => {
       );
 };
 
-export const loadSchool = (result) => {
+export const loadStates = (result) => {
   return {
-    type: FETCH_ALL_SCHOOLS,
+    type: FETCH_ALL_STATES,
     payload: result,
   };
 };
 
-export const fetchSchools = () => {
+export const fetchStates = () => {
   return (dispatch) =>
-    fetch(`${BACKEND_URL}/school/all/?key=${API_KEY}`, {
+    fetch(`${BACKEND_URL}/states/index/?key=${API_KEY}`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -75,11 +69,11 @@ export const fetchSchools = () => {
         if (json.error) {
           throw json.error;
         }
-        return dispatch(loadSchool(json));
+        return dispatch(loadStates(json));
       })
       .catch((error) =>
         dispatch(
-          loadSchool({
+          loadStates({
             success: false,
             message: error.message,
           })
@@ -87,53 +81,16 @@ export const fetchSchools = () => {
       );
 };
 
-export const loadFetchSchoolById = (result) => {
+export const loadDeleteState = (result) => {
   return {
-    type: FETCH_SCHOOL_BY_ID,
+    type: DELETE_STATE,
     payload: result,
   };
 };
 
-export const fetchSchoolById = (id) => {
+export const deleteState = (id) => {
   return (dispatch) =>
-    fetch(`${BACKEND_URL}/school/details/${id}/?key=${API_KEY}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        authorization: `Bearer ${
-          JSON.parse(getFromLocalStorage("tsb-login:admin")).token
-        }`,
-      },
-      body: JSON.stringify(),
-    })
-      .then((response) => response.json())
-      .then((json) => {
-        if (json.error) {
-          throw json.error;
-        }
-        return dispatch(loadFetchSchoolById(json));
-      })
-      .catch((error) =>
-        dispatch(
-          loadFetchSchoolById({
-            success: false,
-            message: error.message,
-          })
-        )
-      );
-};
-
-export const loadDeleteSchool = (result) => {
-  return {
-    type: DELETE_SCHOOL,
-    payload: result,
-  };
-};
-
-export const deleteSchool = (id) => {
-  return (dispatch) =>
-    fetch(`${BACKEND_URL}/school/delete/${id}/?key=${API_KEY}`, {
+    fetch(`${BACKEND_URL}/states/delete/${id}/?key=${API_KEY}`, {
       method: "DELETE",
       headers: {
         Accept: "application/json",
@@ -149,11 +106,11 @@ export const deleteSchool = (id) => {
         if (json.error) {
           throw json.error;
         }
-        return dispatch(loadDeleteSchool(json));
+        return dispatch(loadDeleteState(json));
       })
       .catch((error) =>
         dispatch(
-          loadDeleteSchool({
+          loadDeleteState({
             success: false,
             message: error.message,
           })
@@ -161,22 +118,16 @@ export const deleteSchool = (id) => {
       );
 };
 
-export const loadPatchSchool = (result) => {
+export const loadPatchLState = (result) => {
   return {
-    type: PATCH_SCHOOL,
+    type: PATCH_STATE,
     payload: result,
   };
 };
 
-export const patchSchool = (data, id) => {
-  const userData = {
-    name: data.name,
-    classID: data.classes,
-    subject: { name: data.subject },
-    teacher: { name: data.teacher },
-  };
+export const patchState = (data, id) => {
   return (dispatch) =>
-    fetch(`${BACKEND_URL}/school/edit/${id}/?key=${API_KEY}`, {
+    fetch(`${BACKEND_URL}/states/edit/${id}/?key=${API_KEY}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -185,19 +136,18 @@ export const patchSchool = (data, id) => {
           JSON.parse(getFromLocalStorage("tsb-login:admin")).token
         }`,
       },
-      body: JSON.stringify(userData),
+      body: JSON.stringify(data),
     })
       .then((response) => response.json())
       .then((json) => {
-        console.log("json", json);
         if (json.error) {
           throw json.error;
         }
-        return dispatch(loadPatchSchool(json));
+        return dispatch(loadPatchLState(json));
       })
       .catch((error) =>
         dispatch(
-          loadPatchSchool({
+          loadPatchLState({
             success: false,
             message: error.message,
           })

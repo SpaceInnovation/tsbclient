@@ -72,6 +72,17 @@ const adminRoutes = [
     }),
   },
   {
+    path: "/state",
+    sidebarName: "State",
+    navbarName: "State",
+    icon: LocationCityIcon,
+    exact: true,
+    Component: Loadable({
+      loader: () => import("../Admin/State/state"),
+      loading,
+    }),
+  },
+  {
     path: "/lgaOrigin",
     sidebarName: "LGAOrigin",
     navbarName: "LGAOrigin",
@@ -115,6 +126,26 @@ const adminRoutes = [
       loading,
     }),
   },
+
+  {
+    path: "/posting",
+    sidebarName: "Postings",
+    navbarName: "Postings",
+    icon: Person,
+    exact: true,
+    Component: Loadable({
+      loader: () => import("../Admin/Posting/teacher"),
+      loading,
+    }),
+  },
+  {
+    path: "/posting/teacher/:id",
+    exact: true,
+    Component: Loadable({
+      loader: () => import("../Admin/Posting/posting"),
+      loading,
+    }),
+  },
   {
     path: "/allocation",
     sidebarName: "Allocations",
@@ -126,6 +157,7 @@ const adminRoutes = [
       loading,
     }),
   },
+
   {
     path: "/lga",
     sidebarName: "LGAs",
@@ -160,6 +192,15 @@ const adminRoutes = [
     exact: true,
     Component: Loadable({
       loader: () => import("../Admin/SchoolClass/AddSubject/subject"),
+      loading,
+    }),
+  },
+
+  {
+    path: "/school/teacher/:id",
+    exact: true,
+    Component: Loadable({
+      loader: () => import("../Admin/SchoolClass/AddTeacher/teacher"),
       loading,
     }),
   },

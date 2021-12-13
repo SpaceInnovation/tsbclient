@@ -24,7 +24,6 @@ export const fetchLgas = () => {
     })
       .then((response) => response.json())
       .then((json) => {
-        console.log("json", json);
         if (json.error) {
           throw json.error;
         }
@@ -98,7 +97,6 @@ export const patchLga = (data, id) => {
       fieldID: data.teachers,
     };
   }
-  console.log("lgaData", lgaData);
 
   return (dispatch) =>
     fetch(`${BACKEND_URL}/lga/remove-Item/${id}/?key=${API_KEY}`, {

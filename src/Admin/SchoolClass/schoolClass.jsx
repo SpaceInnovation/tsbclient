@@ -125,7 +125,6 @@ class School extends React.Component {
   }
 
   handleDeleteClick = (schoolClassIDs) => {
-    console.log("schoolClassIDs", schoolClassIDs);
     const { data } = this.state;
     const { deleteSchoolClass } = this.props;
     schoolClassIDs.forEach((schoolClassID, index) => {
@@ -170,33 +169,28 @@ class School extends React.Component {
 
   render() {
     const { data, snackBarOpen, snackBarMessage, snackBarVariant } = this.state;
-    const { schoolClass, postSchoolClass, eachData, match } = this.props;
+    // const { schoolClass, postSchoolClass, eachData, match } = this.props;
+    const { match } = this.props;
     const { id } = match.params;
 
     return (
       <Fragment>
         <Grid container>
-          <Grid item xs={12} sm={6} md={6}>
+          <Grid item xs={12} sm={4} md={4}>
             <AddNew
               type="add"
-              data={data}
+              // data={data}
               id={id}
-              eachData={eachData}
-              schoolClass={schoolClass}
-              postSchoolClass={postSchoolClass}
-              fetchData={this.fetchData}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={6}>
-            <AddNew
-              type="addSubject"
-              id={id}
-              schoolClass={schoolClass}
-              patchSchoolClass={patchSchoolClass}
-              fetchData={this.fetchData}
-            />
+          <Grid item xs={12} sm={4} md={4}>
+            <AddNew type="addSubject" id={id} />
+          </Grid>
+          <Grid item xs={12} sm={4} md={4}>
+            <AddNew type="addTeacher" id={id} />
           </Grid>
         </Grid>
+
         <Grid container item xs={12} sm={12} md={12}>
           <Table
             columnData={columnData}

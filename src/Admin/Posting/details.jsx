@@ -5,28 +5,34 @@ import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
 import Button from "@material-ui/core/Button";
 import Snackbar from "@material-ui/core/Snackbar";
-import MySnackbar from "../../../components/Snackbar";
-import { CircularProgress, MenuItem, Select } from "@material-ui/core";
-import InputLabel from "@material-ui/core/InputLabel";
+import MySnackbar from "../../components/Snackbar";
+import Validator from "../../helpers/validator";
+import isEqual from "lodash/isEqual";
+import { CircularProgress } from "@material-ui/core";
 import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
 import Typography from "@material-ui/core/Typography";
 import { withStyles } from "@material-ui/core";
-import Validator from "../../../helpers/validator";
-import isEqual from "lodash/isEqual";
-import { fetchSubjects } from "../../../actions/actions_admin_subject";
+import {
+  postingsPosting,
+  fetchSchoolByLgaID,
+} from "../../actions/actions_admin_posting";
+import { BACKEND_URL, API_KEY } from "../../actions/api";
+import { getFromLocalStorage } from "../../helpers/browserStorage";
 
 const styles = (theme) => ({
   button: {
     marginRight: theme.spacing.unit,
   },
-  select: {
-    width: 100,
-  },
 });
 
 const initialstate = {
-  subject: "",
-  subjectList: [],
+  lga: "",
+  lgaList: [],
+  school: "",
+  schoolList: [],
   loading: false,
   open: false,
   snackBarOpen: false,
@@ -47,35 +53,28 @@ class AddPage extends Component {
   };
 
   async componentDidMount() {
-    const { fetchSubjects } = this.props;
-    await fetchSubjects();
+    const { id, postingsPosting } = this.props;
+    await postingsPosting(id);
   }
-
   componentWillReceiveProps(newProps) {
-    const { schoolSubject, onCloseModal, eachData } = this.props;
-    if (typeof newProps.subject.fetchSubjects === "object") {
-      const data = newProps.subject.fetchSubjects;
+    const { posting, onCloseModal, eachData } = this.props;
+    // console.log("eachData", eachData);
+    if (typeof newProps.posting.postingsPosting === "object") {
+      const data = newProps.posting.postingsPosting;
       this.setState({
-        subjectList: data,
+        lgaList: data.lgas,
       });
     }
     if (typeof eachData === "object") {
       setTimeout(() => {
         this.setState({
-          subject: eachData.subject._id,
+          name: eachData.name,
         });
       }, 2000);
     }
     if (
-      Validator.propertyExist(
-        newProps,
-        "schoolSubject",
-        "patchSchoolSubject"
-      ) &&
-      isEqual(
-        schoolSubject.patchSchoolSubject,
-        newProps.schoolSubject.patchSchoolSubject
-      ) === false
+      Validator.propertyExist(newProps, "posting", "patchPosting") &&
+      isEqual(posting.patchPosting, newProps.posting.patchPosting) === false
     ) {
       setTimeout(() => {
         onCloseModal();
@@ -84,86 +83,118 @@ class AddPage extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { schoolSubject } = this.props;
-    if (
-      schoolSubject.patchSchoolSubject !==
-      prevProps.schoolSubject.patchSchoolSubject
-    ) {
-      const { patchSchoolSubject } = schoolSubject;
-      const { success } = patchSchoolSubject;
+    const { posting } = this.props;
+    if (posting.patchPosting !== prevProps.posting.patchPosting) {
+      const { patchPosting } = posting;
+      const { success } = patchPosting;
       if (success === false) {
         this.setState({
           snackBarOpen: true,
           snackBarVariant: "error",
-          snackBarMessage: patchSchoolSubject,
+          snackBarMessage: patchPosting.message,
           loading: false,
         });
         return false;
       }
+
       this.setState({
         snackBarOpen: true,
         snackBarVariant: "success",
-        snackBarMessage: patchSchoolSubject,
+        snackBarMessage: patchPosting,
         loading: false,
       });
     }
-    if (
-      schoolSubject.postSchoolSubject !==
-      prevProps.schoolSubject.postSchoolSubject
-    ) {
-      const { postSchoolSubject } = schoolSubject;
-      const { success } = postSchoolSubject;
+
+    if (posting.postPosting !== prevProps.posting.postPosting) {
+      const { postPosting } = posting;
+      const { success } = postPosting;
       if (success === false) {
         this.setState({
           snackBarOpen: true,
           snackBarVariant: "error",
-          snackBarMessage: postSchoolSubject.message,
+          snackBarMessage: postPosting.message,
           loading: false,
         });
         return false;
       }
+
       this.setState({
         snackBarOpen: true,
         snackBarVariant: "success",
-        snackBarMessage: postSchoolSubject,
+        snackBarMessage: postPosting,
         loading: false,
       });
+      setTimeout(() => {
+        window.location.href = "/postings/employed";
+      }, 2000);
     }
   }
-  handleChange = (e) => {
+  handleLgaChange = (e) => {
+    const { name, value } = e.target;
+    this.setState({ [name]: value });
+    fetch(
+      `${BACKEND_URL}/postings/fetchSchoolsBylgaid/${value}/?key=${API_KEY}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          authorization: `Bearer ${
+            JSON.parse(getFromLocalStorage("tsb-login:admin")).token
+          }`,
+        },
+        body: JSON.stringify(),
+      }
+    )
+      .then((response) => response.json())
+      .then((json) => {
+        this.setState({
+          schoolList: json,
+        });
+        if (json.error) {
+          throw json.error;
+        }
+      })
+      .catch((error) => console.log(error));
+  };
+
+  handleSchoolChange = (e) => {
     const { name, value } = e.target;
     this.setState({ [name]: value });
   };
-
   createProperty = (values, e) => {
     e.preventDefault();
     const {
-      postSchoolSubject,
+      postPosting,
       pageType,
-      patchSchoolSubject,
+      patchPosting,
       eachData,
-      fetchData,
       onCloseModal,
-      id,
+      fetchData,
+      posting,
     } = this.props;
+    const { schFromID, teacher } = posting.postingsPosting;
+    console.log("schFromID", schFromID);
 
     switch (pageType) {
       case "add":
-        postSchoolSubject(values, id);
+        postPosting(values, schFromID, teacher._id);
         this.setState({
           loading: true,
         });
         this.clearState();
+
         setTimeout(() => {
           fetchData();
         }, 2000);
+
         setTimeout(() => {
           onCloseModal();
         }, 3000);
-
         break;
+
       case "edit":
-        patchSchoolSubject(values, eachData.school._id, eachData._id);
+        patchPosting(values, eachData._id);
         this.setState({
           loading: true,
         });
@@ -172,10 +203,12 @@ class AddPage extends Component {
         setTimeout(() => {
           fetchData();
         }, 2000);
+
         setTimeout(() => {
           onCloseModal();
         }, 3000);
         break;
+
       default:
         break;
     }
@@ -187,36 +220,35 @@ class AddPage extends Component {
     });
   };
   render() {
+    console.log("this.props", this.props);
+
     let {
-      subject,
-      subjectList,
+      lga,
+      lgaList,
+      school,
+      schoolList,
       loading,
       snackBarOpen,
       snackBarMessage,
       snackBarVariant,
     } = this.state;
 
-    const values = { subject };
-    const { postSchoolSubject } = this.props;
-
+    const { classes, postPosting } = this.props;
+    const values = { lga, school };
     return (
       <>
         <div>
           <Card>
-            {postSchoolSubject ? (
+            {postPosting ? (
               <CardHeader
-                title="Add New Subject"
+                title="Add New Posting"
                 style={{ color: "#2196f3" }}
               />
             ) : (
-              <CardHeader title="Edit Subject" style={{ color: "#2196f3" }} />
+              <CardHeader title="Edit Posting" style={{ color: "#2196f3" }} />
             )}
-
             <CardContent>
               <div style={{ textAlign: "center", justifyContent: "center" }}>
-                <Typography variant="h5" component="h5">
-                  {/* {eachData.schoo} */}
-                </Typography>
                 <form onSubmit={this.createProperty.bind(null, values)}>
                   {loading ? (
                     <div>
@@ -232,29 +264,61 @@ class AddPage extends Component {
                       <Typography>Loading Please wait......</Typography>
                     </div>
                   ) : null}
-                  <h3 style={{ color: "#2196f3" }}>Subject Details</h3>
+                  <h3 style={{ color: "#2196f3" }}>Posting Details</h3>
                   <FormControl fullWidth style={{ marginBottom: "10px" }}>
                     <InputLabel
                       style={{
                         position: "absolute",
                         left: "15px",
                       }}
-                      id="demo-simple-select-label"
+                      id="lga-simple-select-label"
                     >
-                      Subject
+                      LGA
                     </InputLabel>
                     <Select
-                      labelId="demo-simple-select-label"
-                      id="selectedSubject"
-                      value={subject}
-                      name="subject"
-                      onChange={this.handleChange}
+                      labelId="lga-simple-select-label"
+                      // id="selectedLga"
+                      value={lga}
+                      name="lga"
+                      onChange={this.handleLgaChange}
                       variant="outlined"
-                      label="Subject"
+                      label="LGA"
+                      id="lgaID"
+                      fullWidth
                       required
                     >
-                      {subjectList.length > 0
-                        ? subjectList.map((item, key) => (
+                      {lgaList.length > 0
+                        ? lgaList.map((item, key) => (
+                            <MenuItem key={key} value={item._id}>
+                              {item.name}
+                            </MenuItem>
+                          ))
+                        : null}
+                    </Select>
+                  </FormControl>
+                  <FormControl fullWidth style={{ marginBottom: "10px" }}>
+                    <InputLabel
+                      style={{
+                        position: "absolute",
+                        left: "15px",
+                      }}
+                      id="school-simple-select-label"
+                    >
+                      School
+                    </InputLabel>
+                    <Select
+                      labelId="school-simple-select-label"
+                      id="selectedSchool"
+                      value={school}
+                      name="school"
+                      onChange={this.handleSchoolChange}
+                      variant="outlined"
+                      label="School"
+                      fullWidth
+                      required
+                    >
+                      {schoolList.length > 0
+                        ? schoolList.map((item, key) => (
                             <MenuItem key={key} value={item._id}>
                               {item.name}
                             </MenuItem>
@@ -266,14 +330,11 @@ class AddPage extends Component {
                     type="submit"
                     variant="contained"
                     color="primary"
+                    className={classes.button}
                     fullWidth
-                    style={{
-                      fontWeight: "bold",
-                      backgroundColor: "#4bc9f9",
-                      marginTop: "10px",
-                    }}
+                    style={{ fontWeight: "bold", backgroundColor: "#4bc9f9" }}
                   >
-                    {postSchoolSubject ? "Add New" : "Edit"}
+                    {postPosting ? " Add New" : "Edit"}
                   </Button>
                 </form>
               </div>
@@ -295,13 +356,17 @@ class AddPage extends Component {
     );
   }
 }
+
 const mapStateToProps = (state) => ({
-  subject: state.subject,
+  posting: state.posting,
 });
 
 const mapDispatchStateToProps = (dispatch) => ({
-  fetchSubjects: () => {
-    dispatch(fetchSubjects());
+  postingsPosting: (id) => {
+    dispatch(postingsPosting(id));
+  },
+  fetchSchoolByLgaID: (id) => {
+    dispatch(fetchSchoolByLgaID(id));
   },
 });
 

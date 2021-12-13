@@ -1,20 +1,18 @@
 import React, { Component } from "react";
-import AddPage from "./details";
+import AddPage from "../State/details";
 
 class PropertyStepper extends Component {
   render() {
-    const { onCloseModal, postSchoolSubject, schoolSubject, fetchData, id } =
-      this.props;
+    const { onCloseModal, postState, state, fetchData } = this.props;
     return (
       <>
         <div>
           <AddPage
             onCloseModal={onCloseModal}
             pageType="add"
-            postSchoolSubject={postSchoolSubject}
-            schoolSubject={schoolSubject}
+            postState={postState}
+            state={state}
             fetchData={fetchData}
-            id={id}
           />
         </div>
       </>

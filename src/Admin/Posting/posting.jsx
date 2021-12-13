@@ -2,47 +2,75 @@ import { Grid } from "@material-ui/core";
 import React, { Fragment } from "react";
 import { connect } from "react-redux";
 import {
-  fetchSchools,
-  deleteSchool,
-  patchSchool,
-  postSchool,
-  // postSchoolClass,
-} from "../../actions/actions_admin_school";
-import EnhancedTable from "./table";
+  fetchAllPostings,
+  deletePosting,
+  patchPosting,
+  postPosting,
+} from "../../actions/actions_admin_posting";
+import EnhancedTable from "../../components/Table/EnhancedTable";
 import Snackbar from "@material-ui/core/Snackbar";
 import MySnackbar from "../../components/Snackbar";
 import Validator from "../../helpers/validator";
 import TableCell from "@material-ui/core/TableCell";
 import AddNew from "./modal";
-import { getFromLocalStorage } from "../../helpers/browserStorage";
 import { BACKEND_URL, API_KEY } from "../../actions/api";
+import { getFromLocalStorage } from "../../helpers/browserStorage";
 
 const columnData = [
   {
-    id: "name",
+    id: "postedDate",
     numeric: false,
     disablePadding: true,
-    label: "Name",
+    label: "PostedDate",
     searchable: true,
   },
   {
-    id: "lga",
+    id: "serial",
     numeric: false,
     disablePadding: true,
-    label: "LGA",
+    label: "Serial",
+    searchable: true,
+  },
+  {
+    id: "status",
+    numeric: false,
+    disablePadding: true,
+    label: "Status",
+    searchable: true,
+  },
+  {
+    id: "year",
+    numeric: false,
+    disablePadding: true,
+    label: "Year",
+    searchable: true,
   },
 ];
 
 const properties = [
   {
-    name: "name",
+    name: "postedDate",
     component: true,
     padding: true,
     numeric: false,
     img: false,
   },
   {
-    name: "lga",
+    name: "serial",
+    component: true,
+    padding: true,
+    numeric: false,
+    img: false,
+  },
+  {
+    name: "status",
+    component: true,
+    padding: true,
+    numeric: false,
+    img: false,
+  },
+  {
+    name: "year",
     component: true,
     padding: true,
     numeric: false,
@@ -52,7 +80,7 @@ const properties = [
 
 let filteredArray;
 
-class School extends React.Component {
+class LgaOrigin extends React.Component {
   state = {
     data: [],
     snackBarOpen: false,
@@ -61,43 +89,43 @@ class School extends React.Component {
   };
 
   async componentDidMount() {
-    const { fetchSchools } = this.props;
-    await fetchSchools();
+    const { fetchAllPostings } = this.props;
+    await fetchAllPostings();
     this.fetchData();
   }
 
   componentWillReceiveProps(newProps) {
-    const { fetchSchools } = newProps.school;
-    const { success } = fetchSchools;
+    const { fetchAllPostings } = newProps.posting;
+    const { success } = fetchAllPostings;
     if (success === false) {
       this.setState({
         snackBarOpen: true,
         snackBarVariant: "error",
-        snackBarMessage: fetchSchools.message,
+        snackBarMessage: fetchAllPostings.message,
         loading: false,
       });
       return false;
     }
     if (
-      Validator.propertyExist(newProps.school, "fetchSchools") &&
-      typeof newProps.school.fetchSchools === "object"
+      Validator.propertyExist(newProps.posting, "fetchAllPostings") &&
+      typeof newProps.posting.fetchAllPostings === "object"
     ) {
       this.setState({
-        data: newProps.school.fetchSchools,
+        data: newProps.posting.fetchAllPostings,
       });
     } else return null;
   }
 
   componentDidUpdate(prevProps) {
-    const { school } = this.props;
-    if (school.deleteSchool !== prevProps.school.deleteSchool) {
-      const { deleteSchool } = school;
-      const { success } = deleteSchool;
+    const { posting } = this.props;
+    if (posting.deletePosting !== prevProps.posting.deletePosting) {
+      const { deletePosting } = posting;
+      const { success } = deletePosting;
       if (success === false) {
         this.setState({
           snackBarOpen: true,
           snackBarVariant: "error",
-          snackBarMessage: deleteSchool.message,
+          snackBarMessage: deletePosting.message,
           loading: false,
         });
         return false;
@@ -107,14 +135,13 @@ class School extends React.Component {
         data: filteredArray,
         snackBarOpen: true,
         snackBarVariant: "success",
-        snackBarMessage: deleteSchool,
+        snackBarMessage: deletePosting,
         loading: false,
       });
     }
   }
-
   fetchData = () => {
-    return fetch(`${BACKEND_URL}/school/all/?key=${API_KEY}`, {
+    fetch(`${BACKEND_URL}/postings/all/?key=${API_KEY}`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -137,14 +164,14 @@ class School extends React.Component {
       .catch((error) => console.log(error));
   };
 
-  handleDeleteClick = (adminIDs) => {
+  handleDeleteClick = (postingIDs) => {
     const { data } = this.state;
-    const { deleteSchool } = this.props;
+    const { deletePosting } = this.props;
 
-    adminIDs.forEach((adminID, index) => {
-      deleteSchool(adminID);
+    postingIDs.forEach((postingID, index) => {
+      deletePosting(postingID);
       filteredArray = data.filter(
-        (datum) => adminIDs.indexOf(datum._id) === -1
+        (datum) => postingIDs.indexOf(datum._id) === -1
       );
     });
     this.setState({
@@ -159,14 +186,14 @@ class School extends React.Component {
   };
 
   editButtonDisplay = (n) => {
-    const { patchSchool, school } = this.props;
+    const { patchPosting, posting } = this.props;
     return (
       <TableCell>
         <AddNew
           type="edit"
           eachData={n}
-          school={school}
-          patchSchool={patchSchool}
+          posting={posting}
+          patchPosting={patchPosting}
           fetchData={this.fetchData}
         />
       </TableCell>
@@ -175,22 +202,23 @@ class School extends React.Component {
 
   render() {
     const { data, snackBarOpen, snackBarMessage, snackBarVariant } = this.state;
-
-    const { school, postSchool } = this.props;
+    const { posting, postPosting, match } = this.props;
+    const { id } = match.params;
     return (
       <Fragment>
         <Grid container>
           <AddNew
             type="add"
             data={data}
-            school={school}
-            postSchool={postSchool}
+            posting={posting}
+            postPosting={postPosting}
             fetchData={this.fetchData}
+            id={id}
           />
         </Grid>
         <Grid container item xs={12} sm={12} md={12}>
           <div style={{ display: "flex" }}>
-            <h4 style={{ marginRight: "10px" }}>List Of All Schools</h4>
+            <h4 style={{ marginRight: "10px" }}>List Of All Postings</h4>
             <h3>{`[ ${data.length} ]`}</h3>
           </div>
           <EnhancedTable
@@ -199,7 +227,7 @@ class School extends React.Component {
             properties={properties}
             id="_id"
             showSearch
-            searchPlaceholder="Search Name of School"
+            searchPlaceholder="Search Name of lga"
             deleteItem={this.handleDeleteClick}
             editButton={this.editButtonDisplay}
           />
@@ -220,21 +248,19 @@ class School extends React.Component {
   }
 }
 const mapStateToProps = (state) => ({
-  school: state.school,
+  posting: state.posting,
 });
 
 const mapDispatchStateToProps = (dispatch) => ({
-  // School
-  fetchSchools: (data, id) => {
-    dispatch(fetchSchools(data, id));
+  fetchAllPostings: () => {
+    dispatch(fetchAllPostings());
   },
-  deleteSchool: (adminId) => {
-    dispatch(deleteSchool(adminId));
+  deletePosting: (id) => {
+    dispatch(deletePosting(id));
   },
-  patchSchool: (data, adminId) => dispatch(patchSchool(data, adminId)),
-  postSchool: (data) => {
-    dispatch(postSchool(data));
-  },
+  patchPosting: (data, adminId) => dispatch(patchPosting(data, adminId)),
+  postPosting: (data, schFromID, teacherID) =>
+    dispatch(postPosting(data, schFromID, teacherID)),
 });
 
-export default connect(mapStateToProps, mapDispatchStateToProps)(School);
+export default connect(mapStateToProps, mapDispatchStateToProps)(LgaOrigin);

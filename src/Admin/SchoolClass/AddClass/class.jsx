@@ -2,7 +2,7 @@ import { Grid, Typography } from "@material-ui/core";
 import React, { Fragment } from "react";
 import { connect } from "react-redux";
 import {
-  // fetchSchoolClasses,
+  fetchAllSchoolClasses,
   deleteSchoolClass,
   patchSchoolClass,
   postSchoolClass,
@@ -15,7 +15,6 @@ import Table from "./table";
 import { getFromLocalStorage } from "../../../helpers/browserStorage";
 import { BACKEND_URL, API_KEY } from "../../../actions/api";
 import Validator from "../../../helpers/validator";
-import { fetchAllSchoolClasses } from "../../../actions/actions_admin_school";
 
 const columnData = [
   {
@@ -56,7 +55,8 @@ class School extends React.Component {
   }
 
   componentWillReceiveProps(newProps) {
-    const { fetchAllSchoolClasses } = newProps.school;
+    console.log("newProps", newProps);
+    const { fetchAllSchoolClasses } = newProps.schoolClass;
     const success = fetchAllSchoolClasses
       ? fetchAllSchoolClasses.success
       : null;
@@ -70,8 +70,8 @@ class School extends React.Component {
       return false;
     }
     if (
-      Validator.propertyExist(newProps.school, "fetchAllSchoolClasses") &&
-      typeof newProps.school.fetchAllSchoolClasses === "object"
+      Validator.propertyExist(newProps.schoolClass, "fetchAllSchoolClasses") &&
+      typeof newProps.schoolClass.fetchAllSchoolClasses === "object"
     ) {
       setTimeout(() => {
         this.setState({
@@ -154,14 +154,6 @@ class School extends React.Component {
     });
   };
 
-  imagePanelDisplay = (n) => {
-    return (
-      <TableCell>
-        <AddNew type="imageUpload" eachData={n} />
-      </TableCell>
-    );
-  };
-
   editButtonDisplay = (n) => {
     const { patchSchoolClass, schoolClass } = this.props;
     return (
@@ -228,7 +220,6 @@ class School extends React.Component {
             searchPlaceholder="Search Name of School"
             deleteItem={this.handleDeleteClick}
             editButton={this.editButtonDisplay}
-            imagePanelDisplay={this.imagePanelDisplay}
           />
           <Snackbar
             anchorOrigin={{ vertical: "top", horizontal: "center" }}
@@ -248,11 +239,10 @@ class School extends React.Component {
 }
 const mapStateToProps = (state) => ({
   schoolClass: state.schoolClass,
-  school: state.school,
 });
 
 const mapDispatchStateToProps = (dispatch) => ({
-  // School
+  // SchoolClass
   fetchAllSchoolClasses: (id) => {
     dispatch(fetchAllSchoolClasses(id));
   },

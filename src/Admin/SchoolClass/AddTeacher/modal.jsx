@@ -1,16 +1,18 @@
 import React, { Component } from "react";
 import Button from "@material-ui/core/Button";
 import Close from "@material-ui/icons/Close";
-// import PropertyStepper from "../SchoolClass/stepper";
-// import PropertyStepperEdit from "../SchoolClass/stepperEdit";
+import PropertyStepper from "./stepper";
+import PropertyStepperEdit from "./stepperEdit";
+import Transfer from "./stepperTransfer";
 import { withStyles } from "@material-ui/core";
-import modalStyle from "../../assets/jss/material-kit-react/modalStyle";
+import modalStyle from "../../../assets/jss/material-kit-react/modalStyle";
 import Slide from "@material-ui/core/Slide";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import IconButton from "@material-ui/core/IconButton";
-const Link = require("react-router-dom").Link;
+import Edit from "@material-ui/icons/Edit";
+import { Tooltip } from "@material-ui/core";
 
 function Transition(props) {
   return <Slide direction="down" {...props} />;
@@ -37,17 +39,19 @@ class AddNew extends Component {
     const {
       type,
       classes,
-      // patchSchoolClass,
-      // schoolClass,
-      // eachData,
-      // postSchoolClass,
-      // fetchData,
+      patchSchoolTeacher,
+      schoolTeacher,
+      eachData,
+      postSchoolTeacher,
+      fetchData,
       id,
+      postTransfer,
+      posting,
     } = this.props;
     const { modal } = this.state;
     let modalButton;
 
-    // let modalContent;
+    let modalContent;
 
     switch (type) {
       case "add":
@@ -59,18 +63,38 @@ class AddNew extends Component {
             variant="contained"
             style={{ backgroundColor: "#4bc9f9" }}
           >
-            <Link
-              to={`/school/class/${id}`}
-              style={{ textDecoration: "none", color: "#fff" }}
-            >
-              Add New Class
-            </Link>
+            Add New Teacher
           </Button>
         );
 
+        modalContent = (
+          <PropertyStepper
+            onCloseModal={this.handleClose}
+            modalStatus={modal}
+            postSchoolTeacher={postSchoolTeacher}
+            schoolTeacher={schoolTeacher}
+            fetchData={fetchData}
+            id={id}
+          />
+        );
         break;
-
-      case "addSubject":
+      case "edit":
+        modalButton = (
+          <Tooltip title="Edit Class">
+            <Edit style={{ fontSize: "15px" }} onClick={this.handleClickOpen} />
+          </Tooltip>
+        );
+        modalContent = (
+          <PropertyStepperEdit
+            onCloseModal={this.handleClose}
+            schoolTeacher={schoolTeacher}
+            eachData={eachData}
+            patchSchoolTeacher={patchSchoolTeacher}
+            fetchData={fetchData}
+          />
+        );
+        break;
+      case "transfer":
         modalButton = (
           <Button
             size="small"
@@ -79,34 +103,20 @@ class AddNew extends Component {
             variant="contained"
             style={{ backgroundColor: "#4bc9f9" }}
           >
-            <Link
-              to={`/school/subject/${id}`}
-              style={{ textDecoration: "none", color: "#fff" }}
-            >
-              Add New Subject
-            </Link>
+            Transfer
           </Button>
         );
 
-        break;
-      case "addTeacher":
-        modalButton = (
-          <Button
-            size="small"
-            color="primary"
-            onClick={this.handleClickOpen}
-            variant="contained"
-            style={{ backgroundColor: "#4bc9f9" }}
-          >
-            <Link
-              to={`/school/teacher/${id}`}
-              style={{ textDecoration: "none", color: "#fff" }}
-            >
-              Add New Teacher
-            </Link>
-          </Button>
+        modalContent = (
+          <Transfer
+            onCloseModal={this.handleClose}
+            modalStatus={modal}
+            postTransfer={postTransfer}
+            posting={posting}
+            eachData={eachData}
+            id={id}
+          />
         );
-
         break;
 
       default:
@@ -148,7 +158,7 @@ class AddNew extends Component {
             id="modal-slide-description"
             className={classes.modalBody}
           >
-            {/* {modalContent} */}
+            {modalContent}
           </DialogContent>
         </Dialog>
       </div>

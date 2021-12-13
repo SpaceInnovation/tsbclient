@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import Button from "@material-ui/core/Button";
 import Close from "@material-ui/icons/Close";
-// import PropertyStepper from "../SchoolClass/stepper";
-// import PropertyStepperEdit from "../SchoolClass/stepperEdit";
+import PropertyStepper from "./stepper";
+import PropertyStepperEdit from "./stepperEdit";
 import { withStyles } from "@material-ui/core";
 import modalStyle from "../../assets/jss/material-kit-react/modalStyle";
 import Slide from "@material-ui/core/Slide";
@@ -10,7 +10,8 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import IconButton from "@material-ui/core/IconButton";
-const Link = require("react-router-dom").Link;
+import { Tooltip } from "@material-ui/core";
+import Edit from "@material-ui/icons/Edit";
 
 function Transition(props) {
   return <Slide direction="down" {...props} />;
@@ -37,17 +38,18 @@ class AddNew extends Component {
     const {
       type,
       classes,
-      // patchSchoolClass,
-      // schoolClass,
-      // eachData,
-      // postSchoolClass,
-      // fetchData,
+      patchPosting,
+      posting,
+      eachData,
+      postPosting,
+      fetchData,
       id,
     } = this.props;
     const { modal } = this.state;
+
     let modalButton;
 
-    // let modalContent;
+    let modalContent;
 
     switch (type) {
       case "add":
@@ -59,54 +61,37 @@ class AddNew extends Component {
             variant="contained"
             style={{ backgroundColor: "#4bc9f9" }}
           >
-            <Link
-              to={`/school/class/${id}`}
-              style={{ textDecoration: "none", color: "#fff" }}
-            >
-              Add New Class
-            </Link>
+            Add New Posting
           </Button>
+        );
+        modalContent = (
+          <PropertyStepper
+            onCloseModal={this.handleClose}
+            modalStatus={modal}
+            postPosting={postPosting}
+            posting={posting}
+            fetchData={fetchData}
+            id={id}
+          />
         );
 
         break;
-
-      case "addSubject":
+      case "edit":
         modalButton = (
-          <Button
-            size="small"
-            color="primary"
-            onClick={this.handleClickOpen}
-            variant="contained"
-            style={{ backgroundColor: "#4bc9f9" }}
-          >
-            <Link
-              to={`/school/subject/${id}`}
-              style={{ textDecoration: "none", color: "#fff" }}
-            >
-              Add New Subject
-            </Link>
-          </Button>
+          <Tooltip title="Edit">
+            <Edit style={{ fontSize: "15px" }} onClick={this.handleClickOpen} />
+          </Tooltip>
         );
-
-        break;
-      case "addTeacher":
-        modalButton = (
-          <Button
-            size="small"
-            color="primary"
-            onClick={this.handleClickOpen}
-            variant="contained"
-            style={{ backgroundColor: "#4bc9f9" }}
-          >
-            <Link
-              to={`/school/teacher/${id}`}
-              style={{ textDecoration: "none", color: "#fff" }}
-            >
-              Add New Teacher
-            </Link>
-          </Button>
+        modalContent = (
+          <PropertyStepperEdit
+            onCloseModal={this.handleClose}
+            posting={posting}
+            eachData={eachData}
+            patchPosting={patchPosting}
+            fetchData={fetchData}
+            id={id}
+          />
         );
-
         break;
 
       default:
@@ -116,8 +101,8 @@ class AddNew extends Component {
       <div>
         {modalButton}
         <Dialog
-          // fullScreen={true}
-          fullWidth
+          fullScreen={false}
+          // fullWidth
           classes={{
             root: classes.center,
             paper: classes.modal,
@@ -148,7 +133,7 @@ class AddNew extends Component {
             id="modal-slide-description"
             className={classes.modalBody}
           >
-            {/* {modalContent} */}
+            {modalContent}
           </DialogContent>
         </Dialog>
       </div>

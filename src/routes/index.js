@@ -100,6 +100,12 @@ const indexRoutes = [
     Component: (props) => validateAdmin(props),
   },
   {
+    path: `/state`,
+    name: "States",
+    exact: true,
+    Component: (props) => validateAdmin(props),
+  },
+  {
     path: `/lgaOrigin`,
     name: "LGAOrigin",
     exact: true,
@@ -124,11 +130,24 @@ const indexRoutes = [
     Component: (props) => validateAdmin(props),
   },
   {
+    path: `/posting`,
+    name: "Posting",
+    exact: true,
+    Component: (props) => validateAdmin(props),
+  },
+  {
+    path: `/posting/teacher/:id`,
+    name: "Posting Teacher",
+    exact: true,
+    Component: (props) => validateAdmin(props),
+  },
+  {
     path: `/allocation`,
     name: "Allocations",
     exact: true,
     Component: (props) => validateAdmin(props),
   },
+
   {
     path: `/lga`,
     name: "LGAs",
@@ -150,6 +169,12 @@ const indexRoutes = [
   },
   {
     path: `/school/subject/:id`,
+    name: "SchoolSubjects",
+    exact: true,
+    Component: (props) => validateAdmin(props),
+  },
+  {
+    path: `/school/teacher/:id`,
     name: "SchoolTeachers",
     exact: true,
     Component: (props) => validateAdmin(props),

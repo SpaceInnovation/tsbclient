@@ -3,8 +3,7 @@ import {
   POST_SCHOOL,
   DELETE_SCHOOL,
   PATCH_SCHOOL,
-  POST_SCHOOL_CLASS,
-  FETCH_ALL_SCHOOL_CLASSES,
+  FETCH_SCHOOL_BY_ID,
 } from "../actions/types";
 
 const INITIALSTATE = {};
@@ -24,12 +23,8 @@ const schoolReducer = (state = INITIALSTATE, action) => {
     case POST_SCHOOL:
       output = { ...state, postSchool: action.payload };
       break;
-
-    case POST_SCHOOL_CLASS:
-      output = { ...state, postSchoolClass: action.payload };
-      break;
-    case FETCH_ALL_SCHOOL_CLASSES:
-      output = { ...state, fetchAllSchoolClasses: action.payload };
+    case FETCH_SCHOOL_BY_ID:
+      output = { ...state, fetchSchoolById: action.payload };
       break;
 
     default:

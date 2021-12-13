@@ -15,6 +15,7 @@ export const loadPostLgaOrign = (result) => {
 };
 
 export const postLgaOrigin = (data) => {
+  console.log("data", data);
   return (dispatch) =>
     fetch(`${BACKEND_URL}/lgaOrigin/create/?key=${API_KEY}`, {
       method: "POST",
@@ -29,6 +30,7 @@ export const postLgaOrigin = (data) => {
     })
       .then((response) => response.json())
       .then((json) => {
+        console.log("json", json);
         if (json.error) {
           throw json.error;
         }
@@ -53,7 +55,7 @@ export const loadLgasOrigin = (result) => {
 
 export const fetchLgasOrigin = () => {
   return (dispatch) =>
-    fetch(`${BACKEND_URL}/lgaOrigin/all/?key=${API_KEY}`, {
+    fetch(`${BACKEND_URL}/lgaOrigin/index/?key=${API_KEY}`, {
       method: "GET",
       headers: {
         Accept: "application/json",

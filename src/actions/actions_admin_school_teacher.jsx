@@ -1,28 +1,27 @@
 import {
-  FETCH_ALL_SCHOOLS,
-  DELETE_SCHOOL,
-  POST_SCHOOL,
-  PATCH_SCHOOL,
-  FETCH_SCHOOL_BY_ID,
+  FETCH_SCHOOL_TEACHERS,
+  DELETE_SCHOOL_TEACHER,
+  POST_SCHOOL_TEACHER,
+  PATCH_SCHOOL_TEACHER,
+  FETCH_ALL_SCHOOL_TEACHERS,
 } from "./types";
 import { BACKEND_URL, API_KEY } from "./api";
 import { getFromLocalStorage } from "../helpers/browserStorage";
 
-export const loadPostSchool = (result) => {
+export const loadPostSchoolTeacher = (result) => {
   return {
-    type: POST_SCHOOL,
+    type: POST_SCHOOL_TEACHER,
     payload: result,
   };
 };
 
-export const postSchool = (data) => {
-  const userData = {
-    name: data.name,
-    lga: data.lga,
+export const postSchoolTeacher = (data, id) => {
+  const subjectData = {
+    subject: data.subject,
+    school: id,
   };
-
   return (dispatch) =>
-    fetch(`${BACKEND_URL}/school/create/?key=${API_KEY}`, {
+    fetch(`${BACKEND_URL}/schoolteachers/create/?key=${API_KEY}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -31,18 +30,18 @@ export const postSchool = (data) => {
           JSON.parse(getFromLocalStorage("tsb-login:admin")).token
         }`,
       },
-      body: JSON.stringify(userData),
+      body: JSON.stringify(subjectData),
     })
       .then((response) => response.json())
       .then((json) => {
         if (json.error) {
           throw json.error;
         }
-        return dispatch(loadPostSchool(json));
+        return dispatch(loadPostSchoolTeacher(json));
       })
       .catch((error) =>
         dispatch(
-          loadPostSchool({
+          loadPostSchoolTeacher({
             success: false,
             message: error.message,
           })
@@ -50,16 +49,16 @@ export const postSchool = (data) => {
       );
 };
 
-export const loadSchool = (result) => {
+export const loadSchoolTeachers = (result) => {
   return {
-    type: FETCH_ALL_SCHOOLS,
+    type: FETCH_SCHOOL_TEACHERS,
     payload: result,
   };
 };
 
-export const fetchSchools = () => {
+export const fetchSchoolTeachers = () => {
   return (dispatch) =>
-    fetch(`${BACKEND_URL}/school/all/?key=${API_KEY}`, {
+    fetch(`${BACKEND_URL}/schoolteachers/all/?key=${API_KEY}`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -75,11 +74,11 @@ export const fetchSchools = () => {
         if (json.error) {
           throw json.error;
         }
-        return dispatch(loadSchool(json));
+        return dispatch(loadSchoolTeachers(json));
       })
       .catch((error) =>
         dispatch(
-          loadSchool({
+          loadSchoolTeachers({
             success: false,
             message: error.message,
           })
@@ -87,53 +86,16 @@ export const fetchSchools = () => {
       );
 };
 
-export const loadFetchSchoolById = (result) => {
+export const loadDeleteSchoolTeacher = (result) => {
   return {
-    type: FETCH_SCHOOL_BY_ID,
+    type: DELETE_SCHOOL_TEACHER,
     payload: result,
   };
 };
 
-export const fetchSchoolById = (id) => {
+export const deleteSchoolTeacher = (id) => {
   return (dispatch) =>
-    fetch(`${BACKEND_URL}/school/details/${id}/?key=${API_KEY}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        authorization: `Bearer ${
-          JSON.parse(getFromLocalStorage("tsb-login:admin")).token
-        }`,
-      },
-      body: JSON.stringify(),
-    })
-      .then((response) => response.json())
-      .then((json) => {
-        if (json.error) {
-          throw json.error;
-        }
-        return dispatch(loadFetchSchoolById(json));
-      })
-      .catch((error) =>
-        dispatch(
-          loadFetchSchoolById({
-            success: false,
-            message: error.message,
-          })
-        )
-      );
-};
-
-export const loadDeleteSchool = (result) => {
-  return {
-    type: DELETE_SCHOOL,
-    payload: result,
-  };
-};
-
-export const deleteSchool = (id) => {
-  return (dispatch) =>
-    fetch(`${BACKEND_URL}/school/delete/${id}/?key=${API_KEY}`, {
+    fetch(`${BACKEND_URL}/schoolteachers/delete/${id}/?key=${API_KEY}`, {
       method: "DELETE",
       headers: {
         Accept: "application/json",
@@ -149,11 +111,11 @@ export const deleteSchool = (id) => {
         if (json.error) {
           throw json.error;
         }
-        return dispatch(loadDeleteSchool(json));
+        return dispatch(loadDeleteSchoolTeacher(json));
       })
       .catch((error) =>
         dispatch(
-          loadDeleteSchool({
+          loadDeleteSchoolTeacher({
             success: false,
             message: error.message,
           })
@@ -161,22 +123,21 @@ export const deleteSchool = (id) => {
       );
 };
 
-export const loadPatchSchool = (result) => {
+export const loadPatchSchoolTeacher = (result) => {
   return {
-    type: PATCH_SCHOOL,
+    type: PATCH_SCHOOL_TEACHER,
     payload: result,
   };
 };
 
-export const patchSchool = (data, id) => {
+export const patchSchoolTeacher = (data, schoolId, id) => {
   const userData = {
-    name: data.name,
-    classID: data.classes,
-    subject: { name: data.subject },
-    teacher: { name: data.teacher },
+    school: schoolId,
+    subject: data.subject,
   };
+  console.log("userData", userData);
   return (dispatch) =>
-    fetch(`${BACKEND_URL}/school/edit/${id}/?key=${API_KEY}`, {
+    fetch(`${BACKEND_URL}/schoolteachers/edit/${id}/?key=${API_KEY}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -189,15 +150,52 @@ export const patchSchool = (data, id) => {
     })
       .then((response) => response.json())
       .then((json) => {
+        if (json.error) {
+          throw json.error;
+        }
+        return dispatch(loadPatchSchoolTeacher(json));
+      })
+      .catch((error) =>
+        dispatch(
+          loadPatchSchoolTeacher({
+            success: false,
+            message: error.message,
+          })
+        )
+      );
+};
+
+export const loadAllSchoolTeachers = (result) => {
+  return {
+    type: FETCH_ALL_SCHOOL_TEACHERS,
+    payload: result,
+  };
+};
+
+export const fetchAllSchoolTeachers = (id) => {
+  return (dispatch) =>
+    fetch(`${BACKEND_URL}/schoolteachers/school/${id}/?key=${API_KEY}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        authorization: `Bearer ${
+          JSON.parse(getFromLocalStorage("tsb-login:admin")).token
+        }`,
+      },
+      body: JSON.stringify(),
+    })
+      .then((response) => response.json())
+      .then((json) => {
         console.log("json", json);
         if (json.error) {
           throw json.error;
         }
-        return dispatch(loadPatchSchool(json));
+        return dispatch(loadAllSchoolTeachers(json));
       })
       .catch((error) =>
         dispatch(
-          loadPatchSchool({
+          loadAllSchoolTeachers({
             success: false,
             message: error.message,
           })

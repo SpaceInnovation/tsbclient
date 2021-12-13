@@ -3,14 +3,8 @@ import AddPage from "./details";
 
 class PropertyStepper extends Component {
   render() {
-    const {
-      onCloseModal,
-      postSchoolClass,
-      schoolClass,
-      fetchData,
-      eachData,
-      id,
-    } = this.props;
+    const { onCloseModal, postSchoolClass, schoolClass, fetchData, id } =
+      this.props;
     return (
       <>
         <div>
@@ -19,7 +13,6 @@ class PropertyStepper extends Component {
             pageType="add"
             postSchoolClass={postSchoolClass}
             schoolClass={schoolClass}
-            eachData={eachData}
             fetchData={fetchData}
             id={id}
           />

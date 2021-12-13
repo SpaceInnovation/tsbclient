@@ -7,7 +7,7 @@ import {
   patchLgaOrigin,
   postLgaOrigin,
 } from "../../actions/actions_admin_lgaOrigin";
-import EnhancedTable from "../../components/Table/EnhancedTable";
+import EnhancedTable from "./table";
 import Snackbar from "@material-ui/core/Snackbar";
 import MySnackbar from "../../components/Snackbar";
 import Validator from "../../helpers/validator";
@@ -24,6 +24,13 @@ const columnData = [
     label: "Name",
     searchable: true,
   },
+  {
+    id: "stateID",
+    numeric: false,
+    disablePadding: true,
+    label: "State",
+    searchable: true,
+  },
 ];
 
 const properties = [
@@ -34,6 +41,13 @@ const properties = [
     numeric: false,
     img: false,
   },
+  // {
+  //   name: "stateID",
+  //   component: true,
+  //   padding: true,
+  //   numeric: false,
+  //   img: false,
+  // },
 ];
 
 let filteredArray;
@@ -53,6 +67,7 @@ class LgaOrigin extends React.Component {
   }
 
   componentWillReceiveProps(newProps) {
+    console.log("newProps", newProps);
     const { fetchLgasOrigin } = newProps.lga;
     const { success } = fetchLgasOrigin;
     if (success === false) {
@@ -99,7 +114,7 @@ class LgaOrigin extends React.Component {
     }
   }
   fetchData = () => {
-    fetch(`${BACKEND_URL}/lgaOrigin/all/?key=${API_KEY}`, {
+    fetch(`${BACKEND_URL}lgaorigin/index/?key=${API_KEY}`, {
       method: "GET",
       headers: {
         Accept: "application/json",

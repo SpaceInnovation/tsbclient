@@ -163,8 +163,13 @@ const changeTitle = () => {
 
     case "/class":
       return "Classes";
+
     case "/lgaOrigin":
       return "Local Government Origin";
+
+    case "/state":
+      return "State";
+
     default:
       return "Dashboard";
   }

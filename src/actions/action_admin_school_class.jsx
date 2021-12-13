@@ -3,6 +3,7 @@ import {
   DELETE_SCHOOL_CLASS,
   POST_SCHOOL_CLASS,
   PATCH_SCHOOL_CLASS,
+  FETCH_ALL_SCHOOL_CLASSES,
 } from "./types";
 import { BACKEND_URL, API_KEY } from "./api";
 import { getFromLocalStorage } from "../helpers/browserStorage";
@@ -159,6 +160,43 @@ export const patchSchoolClass = (data, schoolId, id) => {
       .catch((error) =>
         dispatch(
           loadPatchSchoolClass({
+            success: false,
+            message: error.message,
+          })
+        )
+      );
+};
+
+export const loadAllSchoolClass = (result) => {
+  return {
+    type: FETCH_ALL_SCHOOL_CLASSES,
+    payload: result,
+  };
+};
+
+export const fetchAllSchoolClasses = (id) => {
+  return (dispatch) =>
+    fetch(`${BACKEND_URL}/schoolClasses/school/${id}/?key=${API_KEY}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        authorization: `Bearer ${
+          JSON.parse(getFromLocalStorage("tsb-login:admin")).token
+        }`,
+      },
+      body: JSON.stringify(),
+    })
+      .then((response) => response.json())
+      .then((json) => {
+        if (json.error) {
+          throw json.error;
+        }
+        return dispatch(loadAllSchoolClass(json));
+      })
+      .catch((error) =>
+        dispatch(
+          loadAllSchoolClass({
             success: false,
             message: error.message,
           })

@@ -6,7 +6,6 @@ import {
 } from "./types";
 import { BACKEND_URL, API_KEY } from "./api";
 import { getFromLocalStorage } from "../helpers/browserStorage";
-import axios from "axios";
 
 export const loadPostTeacher = (result) => {
   return {
@@ -14,73 +13,43 @@ export const loadPostTeacher = (result) => {
     payload: result,
   };
 };
-
 export const postTeacher = (data) => {
-  console.log("data", data);
-  return async (dispatch) => {
-    try {
-      const formData = new FormData();
-      for (let key in data) {
-        if (typeof data[key] === "object") {
-          for (let subKey in data[key]) {
-            formData.append(`${key}[${subKey}]`, data[key][subKey]);
-          }
-        } else {
-          formData.append(key, data[key]);
-        }
+  const formData = new FormData();
+  for (let key in data) {
+    if (typeof data[key] === "object") {
+      for (let subKey in data[key]) {
+        formData.append(`${key}[${subKey}]`, data[key][subKey]);
       }
-      formData.append("imageURL", data.imageURL);
-      // formData.append("LGAOrigin", data.LGAOrigin);
-      // formData.append("NIN", data.NIN);
-      // formData.append("address", data.address);
-      // formData.append("appointmentDate", data.appointmentDate);
-      // formData.append("disability", data.disability);
-      // formData.append("discipline", data.discipline);
-      // formData.append("dob", data.dob);
-      // formData.append("email", data.email);
-      // formData.append("firstName", data.firstName);
-      // formData.append("gender", data.gender);
-      // formData.append("gradeLevel", data.gradeLevel);
-      // formData.append("maritalStatus", data.maritalStatus);
-      // formData.append("phone", data.phone);
-      // formData.append("qualification", data.qualification);
-      // formData.append("spouse", data.spouse);
-      // formData.append("staffID", data.staffID);
-      // formData.append("stateOrigin", data.stateOrigin);
-      // formData.append("subject", data.subject);
-      // formData.append("subject", data.subject);
-      // formData.append("surname", data.surname);
-      // formData.append("title", data.title);
-      // formData.append("nationality", data.nationality);
-      // formData.append("nextOfKin", data.nextOfKin);
-
-      const response = await axios.post(
-        `${BACKEND_URL}/teacher/create/?key=${API_KEY}`,
-        formData,
-        {
-          Accept: "image/*",
-          headers: {
-            "Content-Type": `multipart/form-data`,
-            authorization: `Bearer ${
-              JSON.parse(getFromLocalStorage("tsb-login:admin")).token
-            }`,
-          },
-        }
-      );
-      const json = await response.data;
-      if (json.error) {
-        throw json.error;
-      }
-      return dispatch(loadPostTeacher(json));
-    } catch (error) {
-      return dispatch(
-        loadPostTeacher({
-          success: false,
-          message: error.message,
-        })
-      );
+    } else {
+      formData.append(key, data[key]);
     }
-  };
+  }
+  formData.append("imageURL", data.imageURL);
+  return (dispatch) =>
+    fetch(`${BACKEND_URL}/teacher/create/?key=${API_KEY}`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${
+          JSON.parse(getFromLocalStorage("tsb-login:admin")).token
+        }`,
+      },
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((json) => {
+        if (json.error) {
+          throw json.error;
+        }
+        return dispatch(loadPostTeacher(json));
+      })
+      .catch((error) =>
+        dispatch(
+          loadPostTeacher({
+            success: false,
+            message: error.message,
+          })
+        )
+      );
 };
 
 export const loadTeachers = (result) => {

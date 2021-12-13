@@ -19,8 +19,10 @@ import { fetchGradeLevel } from "../../actions/actions_admin_gradeLevel";
 import { fetchQualification } from "../../actions/actions_admin_qualification";
 import { fetchSubjects } from "../../actions/actions_admin_subject";
 import { connect } from "react-redux";
-import DatePicker from "react-datepicker";
+import { fetchStates } from "../../actions/actions_admin_state";
 import "react-datepicker/dist/react-datepicker.css";
+import { API_KEY, BACKEND_URL } from "../../actions/api";
+import { getFromLocalStorage } from "../../helpers/browserStorage";
 
 const Link = require("react-router-dom").Link;
 
@@ -62,6 +64,7 @@ const initialstate = {
   spouse: "",
   nationality: "",
   stateOrigin: "",
+  stateOriginList: [],
   address: "",
   imageURL: null,
   discipline: "",
@@ -70,6 +73,7 @@ const initialstate = {
   phone: "",
   gender: "",
   LGAOrigin: "",
+  LGAOriginList: [],
   qualification: "",
   qualificationList: [],
   gradeLevel: "",
@@ -104,10 +108,12 @@ class AddPage extends Component {
   };
 
   async componentDidMount() {
-    const { fetchGradeLevel, fetchQualification, fetchSubjects } = this.props;
+    const { fetchGradeLevel, fetchQualification, fetchSubjects, fetchStates } =
+      this.props;
     await fetchGradeLevel();
     await fetchQualification();
     await fetchSubjects();
+    await fetchStates();
   }
 
   componentWillReceiveProps(newProps) {
@@ -133,6 +139,13 @@ class AddPage extends Component {
       });
     }
 
+    if (typeof newProps.state.fetchStates === "object") {
+      const data = newProps.state.fetchStates;
+      this.setState({
+        stateOriginList: data,
+      });
+    }
+
     if (typeof eachData === "object") {
       setTimeout(() => {
         this.setState({
@@ -145,16 +158,16 @@ class AddPage extends Component {
           maritalStatus: eachData.maritalStatus,
           spouse: eachData.spouse,
           nationality: eachData.nationality,
-          stateOrigin: eachData.stateOrigin,
           address: eachData.address,
           discipline: eachData.discipline,
           subject: eachData.subject,
           gender: eachData.gender,
           phone: eachData.phone,
-          LGAOrigin: eachData.LGAOrigin,
+          // LGAOrigin: eachData.LGAOrigin._id,
           qualification: eachData.qualification._id,
           gradeLevel: eachData.gradeLevel._id,
           title: eachData.title,
+          stateOrigin: eachData.stateOrigin._id,
           staffID: eachData.staffID,
           nEmail: eachData.nextOfKin.email,
           nAddress: eachData.nextOfKin.address,
@@ -220,12 +233,6 @@ class AddPage extends Component {
     }
   }
 
-  handleSelectChange = (type, selected) => {
-    this.setState({
-      [type]: selected.value,
-    });
-  };
-
   handleImageChange = (e) => {
     const file = e.target.files[0];
     this.setState({
@@ -246,9 +253,37 @@ class AddPage extends Component {
     });
   };
 
+  handleStateChange = (e) => {
+    const { name, value } = e.target;
+    this.setState({
+      [name]: value,
+    });
+    fetch(`${BACKEND_URL}/lgaOrigin/fetchstate/${value}/?key=${API_KEY}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        authorization: `Bearer ${
+          JSON.parse(getFromLocalStorage("tsb-login:admin")).token
+        }`,
+      },
+      body: JSON.stringify(),
+    })
+      .then((response) => response.json())
+      .then((json) => {
+        this.setState({
+          LGAOriginList: json,
+        });
+        if (json.error) {
+          throw json.error;
+        }
+      })
+      .catch((error) => console.log(error));
+  };
+
   createProperty = (values, e) => {
-    var dateOfBirth = values.dob.toString().substring(0, 16);
-    var dateOfApp = values.appointmentDate.toString().substring(0, 16);
+    // var dateOfBirth = values.dob.toString().substring(0, 16);
+    // var dateOfApp = values.appointmentDate.toString().substring(0, 16);
     e.preventDefault();
     const { nEmail, nAddress, nPhone, nName, nOccupation, nRelationship } =
       values;
@@ -262,8 +297,8 @@ class AddPage extends Component {
         occupation: nOccupation,
         relationship: nRelationship,
       },
-      dob: dateOfBirth,
-      appointmentDate: dateOfApp,
+      // dob: dateOfBirth,
+      // appointmentDate: dateOfApp,
     };
 
     const {
@@ -336,6 +371,7 @@ class AddPage extends Component {
       gender,
       phone,
       LGAOrigin,
+      LGAOriginList,
       qualification,
       gradeLevel,
       loading,
@@ -355,6 +391,7 @@ class AddPage extends Component {
       qualificationList,
       gradeLevelList,
       subjectList,
+      stateOriginList,
     } = this.state;
     const { classes, postTeacher } = this.props;
     const values = {
@@ -540,28 +577,61 @@ class AddPage extends Component {
                       />
                     </Grid>
                     <Grid item xs={12} md={6} sm={6} lg={6}>
-                      <TextField
-                        label="LGA Origin"
-                        value={LGAOrigin}
-                        onChange={this.handleChange}
-                        margin="normal"
-                        variant="outlined"
-                        name="LGAOrigin"
-                        fullWidth
-                        // required
-                      />
+                      <FormControl fullWidth>
+                        <InputLabel
+                          className={classes.InputLabel}
+                          id="state-simple-select-label"
+                        >
+                          Select State
+                        </InputLabel>
+                        <Select
+                          labelId="state-simple-select-label"
+                          id="selectedState"
+                          label="StateOrigin"
+                          value={stateOrigin}
+                          name="stateOrigin"
+                          onChange={this.handleStateChange}
+                          variant="outlined"
+                          // required
+                        >
+                          {stateOriginList.length > 0
+                            ? stateOriginList.map((item, key) => (
+                                <MenuItem key={key} value={item._id}>
+                                  {item.name}
+                                </MenuItem>
+                              ))
+                            : null}
+                        </Select>
+                      </FormControl>
                     </Grid>
                     <Grid item xs={12} md={6} sm={6} lg={6}>
-                      <TextField
-                        label="Address"
-                        value={address}
-                        onChange={this.handleChange}
-                        margin="normal"
-                        variant="outlined"
-                        name="address"
-                        fullWidth
-                        // required
-                      />
+                      <FormControl fullWidth>
+                        <InputLabel
+                          className={classes.InputLabel}
+                          id="lga-simple-select-label"
+                        >
+                          Select LGA
+                        </InputLabel>
+                        <Select
+                          labelId="lga-simple-select-label"
+                          id="selectedLga"
+                          value={LGAOrigin}
+                          name="LGAOrigin"
+                          onChange={this.handleChange}
+                          variant="outlined"
+                          label="School"
+                          fullWidth
+                          // required
+                        >
+                          {LGAOriginList.length > 0
+                            ? LGAOriginList.map((item, key) => (
+                                <MenuItem key={key} value={item._id}>
+                                  {item.name}
+                                </MenuItem>
+                              ))
+                            : null}
+                        </Select>
+                      </FormControl>
                     </Grid>
                     <Grid item xs={12} md={6} sm={6} lg={6}>
                       <FormControl fullWidth>
@@ -621,16 +691,17 @@ class AddPage extends Component {
                     </Grid>
                     <Grid item xs={12} md={6} sm={6} lg={6}>
                       <TextField
-                        label="State Of Origin"
-                        value={stateOrigin}
+                        label="Address"
+                        value={address}
                         onChange={this.handleChange}
                         margin="normal"
                         variant="outlined"
-                        name="stateOrigin"
+                        name="address"
                         fullWidth
                         // required
                       />
                     </Grid>
+
                     <Grid item xs={12} md={6} sm={6} lg={6}>
                       <TextField
                         label="Discipline"
@@ -755,12 +826,12 @@ class AddPage extends Component {
                       <InputLabel htmlFor="dateOfAppointment">
                         <Typography>Date of Appointment</Typography>
                       </InputLabel>
-                      <DatePicker
+                      <input
+                        type="date"
                         id="dateOfAppointment"
-                        selected={appointmentDate}
-                        onChange={(date) =>
-                          this.handleDateChange("appointmentDate", date)
-                        }
+                        name="appointmentDate"
+                        value={appointmentDate}
+                        onChange={this.handleChange}
                         className={classes.date}
                       />
                     </Grid>
@@ -769,10 +840,12 @@ class AddPage extends Component {
                       <InputLabel htmlFor="dateOfBirth">
                         <Typography>Date of Birth</Typography>
                       </InputLabel>
-                      <DatePicker
-                        selected={dob}
+                      <input
+                        type="date"
+                        name="dob"
+                        value={dob}
                         id="dateOfBirth"
-                        onChange={(date) => this.handleDateChange("dob", date)}
+                        onChange={this.handleChange}
                         className={classes.date}
                       />
                     </Grid>
@@ -902,6 +975,7 @@ const mapStateToProps = (state) => ({
   qualification: state.qualification,
   teacher: state.teacher,
   subject: state.subject,
+  state: state.state,
 });
 
 const mapDispatchStateToProps = (dispatch) => ({
@@ -913,6 +987,9 @@ const mapDispatchStateToProps = (dispatch) => ({
   },
   fetchSubjects: () => {
     dispatch(fetchSubjects());
+  },
+  fetchStates: () => {
+    dispatch(fetchStates());
   },
 });
 
